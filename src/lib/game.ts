@@ -208,6 +208,21 @@ export const ACHIEVEMENTS: Achievement[] = [
    Derived values
    -------------------------------------------------------------------- */
 
+/** History plus the week in progress, if it has resolved to done or frozen. */
+export function fullHistory(s: PlayerState): WeekRecord[] {
+  if (s.weekStatus !== 'done' && s.weekStatus !== 'frozen') return s.history
+  return [
+    ...s.history,
+    {
+      weekIndex: s.weekIndex,
+      status: s.weekStatus,
+      difficulty: s.weekDifficulty,
+      xp: s.weekDifficulty ? TIERS[s.weekDifficulty].xp : 0,
+      reaction: s.weekReaction,
+    },
+  ]
+}
+
 export function completedCount(s: PlayerState): number {
   const past = s.history.filter((w) => w.status === 'done').length
   return past + (s.weekStatus === 'done' ? 1 : 0)

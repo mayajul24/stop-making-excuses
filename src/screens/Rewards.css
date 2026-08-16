@@ -1,0 +1,124 @@
+.rewards {
+  padding: max(20px, env(safe-area-inset-top)) 16px 24px;
+  gap: 0;
+}
+
+.rewards__head {
+  padding-bottom: 20px;
+}
+
+.rewards__coins {
+  font-family: var(--display);
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--gold);
+  margin: 4px 0 0;
+}
+
+.rewards__section {
+  display: block;
+  margin: 18px 0 10px;
+}
+
+.rewards__section:first-of-type {
+  margin-top: 0;
+}
+
+/* --- Maya's rewards: locked proof, not a redeem button ---------- */
+
+.mayalist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mayacard {
+  background: var(--card-sunk);
+  border: 1.5px dashed var(--card-edge);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+}
+
+.mayacard[data-unlocked='true'] {
+  border: 2px solid var(--gold-deep);
+  background: linear-gradient(160deg, var(--card), rgba(255, 200, 0, 0.08));
+}
+
+.mayacard__top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-faint);
+}
+
+.mayacard[data-unlocked='true'] .mayacard__top {
+  color: var(--gold);
+}
+
+.mayacard__title {
+  font-family: var(--display);
+  font-size: 14.5px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+/* --- self rewards: spend coins ----------------------------------- */
+
+.selflist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.selfcard {
+  background: var(--card);
+  border: 2px solid var(--card-edge);
+  border-bottom-width: var(--lip);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.selfcard__info {
+  flex: 1;
+}
+
+.selfcard__title {
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.selfcard__cost {
+  font-size: 11.5px;
+  color: var(--gold);
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.selfcard__btn {
+  background: var(--rose);
+  color: var(--on-color);
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 12px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  box-shadow: 0 3px 0 var(--rose-deep);
+  white-space: nowrap;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.selfcard__btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 var(--rose-deep);
+}
+
+.selfcard__btn:disabled {
+  background: var(--card-sunk);
+  color: var(--text-faint);
+  box-shadow: none;
+  cursor: not-allowed;
+}

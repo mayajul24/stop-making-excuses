@@ -1,0 +1,75 @@
+.wins {
+  padding: max(20px, env(safe-area-inset-top)) 16px 24px;
+  gap: 0;
+}
+
+.wins__head {
+  padding-bottom: 20px;
+}
+
+.wins__count {
+  font-family: var(--display);
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 4px 0 0;
+}
+
+.wins__count span {
+  font-size: 18px;
+  color: var(--text-faint);
+  font-weight: 700;
+}
+
+.wins__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.wincard {
+  background: var(--card);
+  border: 2px solid var(--card-edge);
+  border-bottom-width: var(--lip);
+  border-radius: var(--r-md);
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  opacity: 0.42;
+}
+
+.wincard[data-unlocked='true'] {
+  opacity: 1;
+  border-color: var(--gold-deep);
+  background: linear-gradient(160deg, var(--card), rgba(255, 200, 0, 0.08));
+}
+
+.wincard__emoji {
+  font-size: 28px;
+  filter: grayscale(1);
+}
+
+.wincard[data-unlocked='true'] .wincard__emoji {
+  filter: none;
+}
+
+.wincard__title {
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+}
+
+.wincard__blurb {
+  font-size: 10.5px;
+  color: var(--text-faint);
+  line-height: 1.4;
+}
+
+.wincard[data-unlocked='true'] .wincard__blurb {
+  color: var(--text-soft);
+}

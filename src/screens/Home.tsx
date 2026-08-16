@@ -6,6 +6,19 @@ import { mockDaysLeft, mockPlayer } from '../data/mock'
 import { Path } from '../components/Path'
 import './Home.css'
 
+/*
+  Mirrors the two-tier hierarchy from Duolingo's real unit bar + lesson card:
+  the pinned green bar carries the week-level status (context, always true),
+  the docked card at the bottom carries the specific mission (the one thing
+  she can act on right now). They should never say the same sentence twice.
+*/
+function statusLine(status: 'open' | 'done' | 'frozen' | 'missed', hasTier: boolean) {
+  if (status === 'done') return 'Nice work this week'
+  if (status === 'frozen') return 'Resting this week'
+  if (!hasTier) return 'Out of courage'
+  return 'Choose your challenge'
+}
+
 export function Home() {
   const player = mockPlayer
 
@@ -17,34 +30,48 @@ export function Home() {
   const suggested = bestAffordable(player)
   const tier = suggested ? TIERS[suggested] : null
 
-  const unit =
-    player.weekStatus === 'done'
-      ? { eyebrow: `Week ${player.weekIndex}`, title: 'Done for this week' }
-      : player.weekStatus === 'frozen'
-        ? { eyebrow: `Week ${player.weekIndex}`, title: 'Week on ice' }
-        : tier
-          ? {
-              eyebrow: `Week ${player.weekIndex} · ${tier.rank}`,
-              title: tier.headline,
-            }
-          : { eyebrow: `Week ${player.weekIndex}`, title: 'Out of courage' }
-
   /*
     One action, and it has to match the state of the week. A finished week
-    must not still be shouting "next step" at her — that reads as though
-    what she just did didn't count.
+    must not still be shouting a mission at her — that reads as though what
+    she just did didn't count.
   */
-  function renderAction() {
+  function renderMissionCard() {
     if (player.weekStatus === 'done') {
-      return <div className="done-note">Week complete ✓ &nbsp;See you next week.</div>
+      return (
+        <div className="misscard misscard--muted">
+          <span className="misscard__title">Week complete ✓</span>
+          <span className="misscard__sub">See you next week.</span>
+        </div>
+      )
     }
     if (player.weekStatus === 'frozen') {
-      return <div className="done-note">Week on ice ❄️ &nbsp;Streak protected.</div>
+      return (
+        <div className="misscard misscard--muted">
+          <span className="misscard__title">Week on ice ❄️</span>
+          <span className="misscard__sub">Streak protected.</span>
+        </div>
+      )
     }
     if (!tier) {
-      return <button className="btn btn--rose">💗 OUT OF COURAGE — REFILL</button>
+      return (
+        <div className="misscard misscard--rose">
+          <span className="misscard__eyebrow">Out of courage</span>
+          <span className="misscard__title">Refill to keep going</span>
+          <button className="misscard__pill misscard__pill--rose">
+            👀 Look at profiles — free
+          </button>
+        </div>
+      )
     }
-    return <button className="btn">NEXT STEP: {tier.action}</button>
+    return (
+      <div className="misscard">
+        <span className="misscard__eyebrow">
+          {tier.rank} · +{tier.xp} XP
+        </span>
+        <span className="misscard__title">{tier.headline}</span>
+        <button className="misscard__pill">START</button>
+      </div>
+    )
   }
 
   return (
@@ -68,8 +95,10 @@ export function Home() {
 
         <div className="unitbar">
           <div className="unitbar__text">
-            <span className="unitbar__eyebrow">{unit.eyebrow}</span>
-            <span className="unitbar__title">{unit.title}</span>
+            <span className="unitbar__eyebrow">Week {player.weekIndex}</span>
+            <span className="unitbar__title">
+              {statusLine(player.weekStatus, !!tier)}
+            </span>
           </div>
           <button className="unitbar__side" aria-label="Change difficulty">
             ⇄
@@ -86,7 +115,7 @@ export function Home() {
         <Path nodes={nodes} dogLine={voice.dogLine} dogMood={voice.dogMood} />
       </div>
 
-      <div className="home__dock">{renderAction()}</div>
+      <div className="home__dock">{renderMissionCard()}</div>
     </div>
   )
 }

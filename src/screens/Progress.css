@@ -1,0 +1,110 @@
+.progressScreen {
+  padding: max(20px, env(safe-area-inset-top)) 16px 24px;
+  gap: 20px;
+}
+
+.levelcard {
+  background: var(--card);
+  border: 2px solid var(--card-edge);
+  border-bottom-width: var(--lip);
+  border-radius: var(--r-lg);
+  padding: 24px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.levelcard__badge {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.levelcard__title {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 800;
+  margin: 8px 0 2px;
+}
+
+.levelcard__sub {
+  font-size: 12.5px;
+  color: var(--text-faint);
+}
+
+.levelcard__track {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--card-sunk);
+  margin-top: 16px;
+  overflow: hidden;
+}
+
+.levelcard__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-deep), var(--green));
+  border-radius: 999px;
+  transition: width 0.4s var(--ease-out);
+}
+
+.levelcard__next {
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+}
+
+.statgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.statcard {
+  background: var(--card);
+  border: 2px solid var(--card-edge);
+  border-bottom-width: var(--lip);
+  border-radius: var(--r-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statcard__icon {
+  font-size: 18px;
+}
+
+.statcard__num {
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.statcard__lbl {
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+.progressScreen__notesLabel {
+  margin-top: 4px;
+}
+
+.notelist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.note {
+  background: var(--card-sunk);
+  border-radius: var(--r-sm);
+  padding: 11px 13px;
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.45;
+}

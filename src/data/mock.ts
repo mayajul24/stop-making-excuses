@@ -1,4 +1,4 @@
-import type { PlayerState } from '../types'
+import type { MayaReward, PlayerState, SelfReward } from '../types'
 
 /*
   Mock data stands in for the backend. Everything the UI reads comes through
@@ -38,3 +38,15 @@ export const mockPlayer: PlayerState = {
 
 /** Days left in the current week — at 2 or fewer the voice starts nagging. */
 export const mockDaysLeft = 5
+
+export const mockSelfRewards: SelfReward[] = [
+  { id: 'r1', title: 'A nice coffee or a treat', cost: 20 },
+  { id: 'r2', title: 'A little something for me', cost: 40 },
+  { id: 'r3', title: 'Movie night + snacks', cost: 70 },
+]
+
+export const mockMayaRewards: MayaReward[] = [
+  { id: 'm1', xpThreshold: 100, title: 'I owe you a coffee ☕' },
+  { id: 'm2', xpThreshold: 250, title: 'Wine night together 🍷' },
+  { id: 'm3', xpThreshold: 500, title: 'A little gift from me 🎁' },
+]

@@ -36,20 +36,37 @@ button {
    --------------------------------------------------------------- */
 
 .shell {
-  min-height: 100%;
+  height: 100vh;
   display: flex;
   justify-content: center;
   background: var(--bg-mid);
 }
 
-/* No horizontal padding here — the sticky HUD needs to span the full column
+/*
+  The app column: a fixed-height flex frame holding a scrolling body above a
+  tab bar that never moves. Each screen's own sticky header/dock positions
+  against .app__scroll, not the window — that's what lets the tab bar stay
+  put while a screen's internal HUD pins to the top of its own content.
+*/
+.app {
+  width: 100%;
+  max-width: 440px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.app__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* No horizontal padding here — sticky headers need to span the full column
    so nothing scrolls visibly past its edges. Children pad themselves. */
 .page {
   width: 100%;
-  max-width: 440px;
-  /* No bottom padding — the sticky dock supplies its own, and padding here
-     would leave it floating above the viewport edge at full scroll. */
-  padding: 0;
   display: flex;
   flex-direction: column;
 }

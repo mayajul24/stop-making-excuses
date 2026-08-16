@@ -18,6 +18,20 @@ export interface WeekRecord {
   reaction: Reaction | null
 }
 
+/** A treat she can buy herself with coins. Doesn't touch XP or level. */
+export interface SelfReward {
+  id: string
+  title: string
+  cost: number
+}
+
+/** Something Maya owes her once lifetime XP clears the threshold. */
+export interface MayaReward {
+  id: string
+  xpThreshold: number
+  title: string
+}
+
 /** Everything the player owns. This is the shape a backend would return. */
 export interface PlayerState {
   xp: number
