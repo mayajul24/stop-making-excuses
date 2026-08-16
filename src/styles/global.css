@@ -36,7 +36,13 @@ button {
    --------------------------------------------------------------- */
 
 .shell {
+  /* 100vh on a phone browser is measured against the viewport with its
+     chrome (address bar) hidden — taller than what's actually on screen
+     when the page loads, so the tab bar renders below the fold until you
+     scroll. 100dvh tracks the real visible height as the chrome shows and
+     hides. Keep the vh line first as a fallback for browsers without dvh. */
   height: 100vh;
+  height: 100dvh;
   display: flex;
   justify-content: center;
   background: var(--bg-mid);
