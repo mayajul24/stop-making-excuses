@@ -30,8 +30,8 @@
 .vitals {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 4px;
+  justify-content: flex-start;
+  gap: 18px;
   padding: 0 2px 12px;
 }
 
