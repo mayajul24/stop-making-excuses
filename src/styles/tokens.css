@@ -10,28 +10,28 @@
 :root {
   color-scheme: dark;
 
-  /* ground */
-  --bg-top: #16212e;
-  --bg-mid: #121b26;
-  --bg-bottom: #0e161f;
+  /* ground — a desaturated charcoal, never flat black */
+  --bg-top: #16232a;
+  --bg-mid: #131f24;
+  --bg-bottom: #111c21;
 
   /* raised surfaces */
-  --card: #1e2c3a;
-  --card-edge: #2b3d4e;
-  --card-sunk: #1a2733;
+  --card: #202f36;
+  --card-edge: #37464f;
+  --card-sunk: #1b272d;
 
   /* text */
-  --text: #eaf2f8;
-  --text-soft: #9db2c4;
-  --text-faint: #6b8199;
+  --text: #f1f7fb;
+  --text-soft: #93a5ae;
+  --text-faint: #6c7f89;
   --on-color: #ffffff;
 
   /* the action green */
-  --green: #58cc4a;
-  --green-deep: #3d9632;
-  --green-soft: #9ce68f;
-  --green-wash: rgba(88, 204, 74, 0.13);
-  --green-line: rgba(88, 204, 74, 0.38);
+  --green: #58cc02;
+  --green-deep: #43a302;
+  --green-soft: #a5e86b;
+  --green-wash: rgba(88, 204, 2, 0.13);
+  --green-line: rgba(88, 204, 2, 0.38);
 
   /* streak orange */
   --orange: #ff9a3c;
@@ -41,20 +41,20 @@
   --orange-line: rgba(255, 154, 60, 0.38);
 
   /* courage rose */
-  --rose: #f4788c;
-  --rose-deep: #cf4f64;
-  --rose-soft: #ffa8b6;
+  --rose: #ff5e7a;
+  --rose-deep: #d63e58;
+  --rose-soft: #ff90a4;
 
   /* milestone gold */
-  --gold: #ffc93c;
-  --gold-deep: #d9a012;
+  --gold: #ffc800;
+  --gold-deep: #d9a300;
 
   /* banner blue */
-  --blue: #3fb0e8;
-  --blue-deep: #2183b5;
-  --blue-soft: #8ed6f7;
-  --blue-wash: rgba(63, 176, 232, 0.13);
-  --blue-line: rgba(63, 176, 232, 0.38);
+  --blue: #1cb0f6;
+  --blue-deep: #1899d6;
+  --blue-soft: #7fd4fb;
+  --blue-wash: rgba(28, 176, 246, 0.13);
+  --blue-line: rgba(28, 176, 246, 0.38);
 
   /* freeze lilac */
   --lilac: #a78be8;

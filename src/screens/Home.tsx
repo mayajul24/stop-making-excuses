@@ -17,6 +17,18 @@ export function Home() {
   const suggested = bestAffordable(player)
   const tier = suggested ? TIERS[suggested] : null
 
+  const unit =
+    player.weekStatus === 'done'
+      ? { eyebrow: `Week ${player.weekIndex}`, title: 'Done for this week' }
+      : player.weekStatus === 'frozen'
+        ? { eyebrow: `Week ${player.weekIndex}`, title: 'Week on ice' }
+        : tier
+          ? {
+              eyebrow: `Week ${player.weekIndex} · ${tier.rank}`,
+              title: tier.headline,
+            }
+          : { eyebrow: `Week ${player.weekIndex}`, title: 'Out of courage' }
+
   /*
     One action, and it has to match the state of the week. A finished week
     must not still be shouting "next step" at her — that reads as though
@@ -37,23 +49,40 @@ export function Home() {
 
   return (
     <div className="page home">
-      <header className="topbar">
-        <span className="pill pill--streak">
-          🔥 <b>{player.streakCurrent}</b> week streak
-        </span>
-        <span className="pill pill--courage">
-          💗 <b>{player.courage}</b> Courage
-        </span>
+      {/* Stays put however far down the journey she scrolls. */}
+      <header className="hud">
+        <div className="vitals">
+          <span className="vital vital--streak">
+            🔥 <b>{player.streakCurrent}</b>
+          </span>
+          <span className="vital vital--courage">
+            💗 <b>{player.courage}</b>
+          </span>
+          <span className="vital vital--xp">
+            ⭐ <b>{player.xp}</b>
+          </span>
+          <span className="vital vital--freeze">
+            ❄️ <b>{player.freezeTokens}</b>
+          </span>
+        </div>
+
+        <div className="unitbar">
+          <div className="unitbar__text">
+            <span className="unitbar__eyebrow">{unit.eyebrow}</span>
+            <span className="unitbar__title">{unit.title}</span>
+          </div>
+          <button className="unitbar__side" aria-label="Change difficulty">
+            ⇄
+          </button>
+        </div>
       </header>
 
-      <div className="ribbon rise">Your Dating Journey</div>
+      <div className="home__body">
+        <div className={`banner banner--${voice.bannerTone} rise`}>
+          <strong className="banner__title">{voice.bannerTitle}</strong>
+          <span className="banner__sub">{voice.bannerSub}</span>
+        </div>
 
-      <div className={`banner banner--${voice.bannerTone} rise`}>
-        <strong className="banner__title">{voice.bannerTitle}</strong>
-        <span className="banner__sub">{voice.bannerSub}</span>
-      </div>
-
-      <div className="home__scroll">
         <Path nodes={nodes} dogLine={voice.dogLine} dogMood={voice.dogMood} />
       </div>
 

@@ -106,7 +106,9 @@
   letter-spacing: 0.07em;
   text-align: center;
   color: var(--text-soft);
-  max-width: 130px;
+  /* Also sets the slot width, which is what the dog is positioned against —
+     widening this pushes her toward the screen edge on narrow phones. */
+  max-width: 112px;
 }
 
 .path__label[data-kind='current'] {
@@ -153,7 +155,7 @@
 .path__dog {
   position: absolute;
   top: -10px;
-  width: 118px;
+  width: 104px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -162,11 +164,11 @@
 }
 
 .path__dog[data-side='right'] {
-  left: calc(100% + 8px);
+  left: calc(100% + 6px);
 }
 
 .path__dog[data-side='left'] {
-  right: calc(100% + 8px);
+  right: calc(100% + 6px);
 }
 
 .path__bubble {
@@ -195,8 +197,12 @@
   border-bottom: 7px solid var(--card-edge);
 }
 
-@media (max-width: 359px) {
+@media (max-width: 370px) {
   .path__dog {
-    width: 100px;
+    width: 92px;
+  }
+  .path__bubble {
+    font-size: 11px;
+    padding: 6px 8px;
   }
 }

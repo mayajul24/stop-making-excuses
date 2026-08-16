@@ -14,7 +14,7 @@ body,
 
 body {
   margin: 0;
-  background: var(--bg-bottom);
+  background: var(--bg-mid);
   color: var(--text);
   font-family: var(--ui);
   -webkit-font-smoothing: antialiased;
@@ -39,29 +39,19 @@ button {
   min-height: 100%;
   display: flex;
   justify-content: center;
-  background: linear-gradient(
-    180deg,
-    var(--bg-top) 0%,
-    var(--bg-mid) 45%,
-    var(--bg-bottom) 100%
-  );
-  background-attachment: fixed;
+  background: var(--bg-mid);
 }
 
+/* No horizontal padding here — the sticky HUD needs to span the full column
+   so nothing scrolls visibly past its edges. Children pad themselves. */
 .page {
   width: 100%;
   max-width: 440px;
-  padding: max(14px, env(safe-area-inset-top)) 16px
-    calc(24px + env(safe-area-inset-bottom));
+  /* No bottom padding — the sticky dock supplies its own, and padding here
+     would leave it floating above the viewport edge at full scroll. */
+  padding: 0;
   display: flex;
   flex-direction: column;
-}
-
-@media (min-width: 900px) {
-  .page {
-    padding-top: 32px;
-    padding-bottom: 48px;
-  }
 }
 
 /* ---------------------------------------------------------------
