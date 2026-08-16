@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react'
 import type { PathNode } from '../lib/path'
 import type { Mood } from '../lib/voice'
-import { Doggo } from './Doggo'
+import { Mascot } from './Mascot'
 import './Path.css'
 
 /*
   The winding journey. Nodes snake left and right down the page with a dotted
-  trail between them; the dog stands next to whichever step is live and says
+  trail between them; Maya stands next to whichever step is live and says
   one thing. Everything below the current step is dimmed but visible, so she
   can always see what's coming.
 */
@@ -19,18 +19,18 @@ const GLYPH: Record<PathNode['kind'], string> = {
   milestone: '🎁',
   frozen: '❄️',
   missed: '·',
-  current: '🐾',
+  current: '👣',
   future: '',
 }
 
 export function Path({
   nodes,
-  dogLine,
-  dogMood,
+  mascotLine,
+  mascotMood,
 }: {
   nodes: PathNode[]
-  dogLine: string
-  dogMood: Mood
+  mascotLine: string
+  mascotMood: Mood
 }) {
   const liveStep = useRef<HTMLDivElement>(null)
 
@@ -73,11 +73,11 @@ export function Path({
 
               {node.isLive && (
                 <div
-                  className="path__dog"
+                  className="path__mascot"
                   data-side={offset > 0 ? 'left' : 'right'}
                 >
-                  <Doggo mood={dogMood} size={72} />
-                  <div className="path__bubble">{dogLine}</div>
+                  <Mascot mood={mascotMood} size={72} />
+                  <div className="path__bubble">{mascotLine}</div>
                 </div>
               )}
             </div>

@@ -243,7 +243,11 @@ export function Home() {
           <span className="banner__sub">{voice.bannerSub}</span>
         </div>
 
-        <Path nodes={nodes} dogLine={voice.dogLine} dogMood={voice.dogMood} />
+        <Path
+          nodes={nodes}
+          mascotLine={voice.mascotLine}
+          mascotMood={voice.mascotMood}
+        />
       </div>
 
       <div className="home__dock">{renderMissionCard()}</div>

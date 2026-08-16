@@ -1,0 +1,46 @@
+.mascot {
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.mascot__hairback {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+}
+
+/* Proud: a little bounce. */
+.mascot[data-mood='proud'] {
+  animation: mascot-bounce 0.7s ease-in-out infinite;
+}
+
+/* Idle: hair sways now and then — enough to read as alive. */
+.mascot[data-mood='idle'] .mascot__hairback,
+.mascot[data-mood='smug'] .mascot__hairback {
+  animation: mascot-sway 5s ease-in-out infinite;
+}
+
+/* Unimpressed: nothing moves — the heavy lids do all the acting. */
+
+@keyframes mascot-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes mascot-sway {
+  0%,
+  85%,
+  100% {
+    transform: rotate(0deg);
+  }
+  92% {
+    transform: rotate(-1.5deg);
+  }
+  96% {
+    transform: rotate(1deg);
+  }
+}

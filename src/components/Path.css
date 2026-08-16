@@ -106,8 +106,9 @@
   letter-spacing: 0.07em;
   text-align: center;
   color: var(--text-soft);
-  /* Also sets the slot width, which is what the dog is positioned against —
-     widening this pushes her toward the screen edge on narrow phones. */
+  /* Also sets the slot width, which is what the mascot is positioned
+     against — widening this pushes her toward the screen edge on narrow
+     phones. */
   max-width: 112px;
 }
 
@@ -150,9 +151,9 @@
   background: var(--card-edge);
 }
 
-/* --- the dog, parked next to the live step --------------------- */
+/* --- the mascot, parked next to the live step ------------------- */
 
-.path__dog {
+.path__mascot {
   position: absolute;
   top: -10px;
   width: 104px;
@@ -163,11 +164,11 @@
   animation: rise 0.5s var(--ease-out) 0.25s both;
 }
 
-.path__dog[data-side='right'] {
+.path__mascot[data-side='right'] {
   left: calc(100% + 6px);
 }
 
-.path__dog[data-side='left'] {
+.path__mascot[data-side='left'] {
   right: calc(100% + 6px);
 }
 
@@ -185,7 +186,7 @@
   position: relative;
 }
 
-/* little tail pointing up at the dog */
+/* little tail pointing up at the mascot */
 .path__bubble::before {
   content: '';
   position: absolute;
@@ -198,7 +199,7 @@
 }
 
 @media (max-width: 370px) {
-  .path__dog {
+  .path__mascot {
     width: 92px;
   }
   .path__bubble {

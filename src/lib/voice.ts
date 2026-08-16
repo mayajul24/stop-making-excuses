@@ -13,24 +13,24 @@ export interface HomeVoice {
   bannerTitle: string
   bannerSub: string
   bannerTone: Tone
-  /** What the dog says next to the live step. */
-  dogLine: string
-  dogMood: Mood
+  /** What Maya says next to the live step. */
+  mascotLine: string
+  mascotMood: Mood
 }
 
-const DOG_IDLE = [
-  'Ready? 🐾',
-  'One small thing. That’s it 🐾',
-  'This is your moment 🐾',
+const IDLE_LINES = [
+  'Ready? ✨',
+  'One small thing. That’s it.',
+  'This is your moment.',
 ]
 
-const DOG_NAGGING = [
+const NAGGING_LINES = [
   'Don’t break the streak 😈',
   'Where did you go? 👀',
   'Not from the couch, queen 😂',
 ]
 
-const DOG_PROUD = ['Proud of you 🐾', 'Look at you!', 'See? Not so bad.']
+const PROUD_LINES = ['Proud of you 🥹', 'Look at you!', 'See? Not so bad.']
 
 /** Deterministic pick so copy doesn't reshuffle on every re-render. */
 function pick(list: string[], seed: number): string {
@@ -45,8 +45,8 @@ export function homeVoice(state: PlayerState, daysLeft: number): HomeVoice {
       bannerTitle: 'HOLY SHIT YOU ACTUALLY DID IT',
       bannerSub: `${state.streakCurrent} weeks in a row. Maya has been notified 👀`,
       bannerTone: 'win',
-      dogLine: pick(DOG_PROUD, seed),
-      dogMood: 'proud',
+      mascotLine: pick(PROUD_LINES, seed),
+      mascotMood: 'proud',
     }
   }
 
@@ -55,8 +55,8 @@ export function homeVoice(state: PlayerState, daysLeft: number): HomeVoice {
       bannerTitle: 'WEEK ON ICE ❄️',
       bannerSub: 'Your streak is safe. See you next week.',
       bannerTone: 'calm',
-      dogLine: 'Resting is allowed ❄️',
-      dogMood: 'idle',
+      mascotLine: 'Resting is allowed ❄️',
+      mascotMood: 'idle',
     }
   }
 
@@ -67,8 +67,8 @@ export function homeVoice(state: PlayerState, daysLeft: number): HomeVoice {
         daysLeft === 1 ? '1 day' : `${daysLeft} days`
       } left.`,
       bannerTone: 'urgent',
-      dogLine: pick(DOG_NAGGING, seed),
-      dogMood: 'unimpressed',
+      mascotLine: pick(NAGGING_LINES, seed),
+      mascotMood: 'unimpressed',
     }
   }
 
@@ -78,8 +78,8 @@ export function homeVoice(state: PlayerState, daysLeft: number): HomeVoice {
       bannerTitle: 'You spent 3 weeks saying “maybe next week”.',
       bannerSub: 'This is your villain origin story.',
       bannerTone: 'urgent',
-      dogLine: 'Let’s break the curse 🐾',
-      dogMood: 'unimpressed',
+      mascotLine: 'Let’s break the curse ✨',
+      mascotMood: 'unimpressed',
     }
   }
 
@@ -93,7 +93,7 @@ export function homeVoice(state: PlayerState, daysLeft: number): HomeVoice {
         ? 'New week, one mission. Let’s keep going.'
         : 'Week one. Nothing to lose.',
     bannerTone: 'calm',
-    dogLine: pick(DOG_IDLE, seed),
-    dogMood: state.streakCurrent >= 4 ? 'smug' : 'idle',
+    mascotLine: pick(IDLE_LINES, seed),
+    mascotMood: state.streakCurrent >= 4 ? 'smug' : 'idle',
   }
 }

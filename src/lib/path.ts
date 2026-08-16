@@ -17,8 +17,9 @@ export interface PathNode {
   weekIndex: number
   /**
    * The node for the week she is standing in right now, whether it's still
-   * open, already done, or frozen. The dog parks here — including straight
-   * after she completes something, which is when she most wants company.
+   * open, already done, or frozen. The mascot parks here — including
+   * straight after she completes something, which is when she most wants
+   * company.
    */
   isLive?: boolean
 }
