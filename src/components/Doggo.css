@@ -1,0 +1,73 @@
+.doggo {
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.doggo__ear {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+}
+
+.doggo__tail {
+  transform-box: fill-box;
+  transform-origin: 10% 90%;
+}
+
+/* Happy: tail going properly. */
+.doggo[data-mood='proud'] .doggo__tail {
+  animation: wag 0.36s ease-in-out infinite;
+}
+.doggo[data-mood='proud'] {
+  animation: hop 0.72s ease-in-out infinite;
+}
+
+/* Idle: an ear twitch now and then, nothing more. */
+.doggo[data-mood='idle'] .doggo__ear--l,
+.doggo[data-mood='smug'] .doggo__ear--l {
+  animation: twitch 5.5s ease-in-out infinite;
+}
+.doggo[data-mood='idle'] .doggo__tail {
+  animation: wag 1.6s ease-in-out infinite;
+}
+
+/* Unimpressed: ears droop and stay there. */
+.doggo[data-mood='unimpressed'] .doggo__ear--l {
+  transform: rotate(-24deg);
+}
+.doggo[data-mood='unimpressed'] .doggo__ear--r {
+  transform: rotate(24deg);
+}
+
+@keyframes wag {
+  0%,
+  100% {
+    transform: rotate(-15deg);
+  }
+  50% {
+    transform: rotate(15deg);
+  }
+}
+
+@keyframes hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes twitch {
+  0%,
+  86%,
+  100% {
+    transform: rotate(0deg);
+  }
+  90% {
+    transform: rotate(-11deg);
+  }
+  94% {
+    transform: rotate(4deg);
+  }
+}

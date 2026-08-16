@@ -1,0 +1,202 @@
+.path {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 0 10px;
+}
+
+.path__step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.path__slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transition: transform 0.4s var(--ease-out);
+}
+
+/* --- the node itself ------------------------------------------- */
+
+.path__node {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  line-height: 1;
+  background: var(--card-sunk);
+  border: 2px solid var(--card-edge);
+  border-bottom-width: 5px;
+  animation: node-pop 0.36s var(--ease-bounce) both;
+}
+
+@keyframes node-pop {
+  from {
+    transform: scale(0.55);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.path__node[data-kind='done'] {
+  background: var(--green);
+  border-color: var(--green-deep);
+  color: var(--on-color);
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.path__node[data-kind='milestone'] {
+  background: var(--gold);
+  border-color: var(--gold-deep);
+  width: 74px;
+  height: 74px;
+  font-size: 30px;
+}
+
+.path__node[data-kind='frozen'] {
+  background: var(--lilac);
+  border-color: var(--lilac-deep);
+}
+
+.path__node[data-kind='missed'] {
+  color: var(--text-faint);
+  font-size: 30px;
+}
+
+.path__node[data-kind='current'] {
+  background: var(--card);
+  border: 3px solid var(--gold);
+  border-bottom-width: 6px;
+  border-bottom-color: var(--gold-deep);
+  animation: node-pop 0.36s var(--ease-bounce) both,
+    glow 1.9s ease-in-out 0.4s infinite;
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 198, 60, 0.55);
+  }
+  55% {
+    box-shadow: 0 0 0 13px rgba(255, 198, 60, 0);
+  }
+}
+
+.path__node[data-kind='future'] {
+  opacity: 0.55;
+}
+
+/* --- labels + stars -------------------------------------------- */
+
+.path__label {
+  margin-top: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-align: center;
+  color: var(--text-soft);
+  max-width: 130px;
+}
+
+.path__label[data-kind='current'] {
+  color: var(--green-deep);
+  font-size: 11px;
+}
+
+.path__label[data-kind='missed'],
+.path__label[data-kind='future'] {
+  color: var(--text-faint);
+}
+
+.path__label[data-kind='milestone'] {
+  color: var(--gold-deep);
+}
+
+.path__stars {
+  margin-top: 2px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--gold);
+}
+
+/* --- the dotted trail between nodes ---------------------------- */
+
+.path__trail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+  transition: transform 0.4s var(--ease-out);
+}
+
+.path__trail i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--card-edge);
+}
+
+/* --- the dog, parked next to the live step --------------------- */
+
+.path__dog {
+  position: absolute;
+  top: -10px;
+  width: 118px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  animation: rise 0.5s var(--ease-out) 0.25s both;
+}
+
+.path__dog[data-side='right'] {
+  left: calc(100% + 8px);
+}
+
+.path__dog[data-side='left'] {
+  right: calc(100% + 8px);
+}
+
+.path__bubble {
+  background: var(--card);
+  border: 2px solid var(--card-edge);
+  border-bottom-width: 3px;
+  border-radius: 14px;
+  padding: 7px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text);
+  text-align: center;
+  position: relative;
+}
+
+/* little tail pointing up at the dog */
+.path__bubble::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 7px solid var(--card-edge);
+}
+
+@media (max-width: 359px) {
+  .path__dog {
+    width: 100px;
+  }
+}

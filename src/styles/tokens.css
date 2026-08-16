@@ -1,0 +1,68 @@
+/*
+  Design tokens — "סתמי ותזדייני"
+
+  Friendly, rounded, bright. Sky-blue paper, white cards with a chunky
+  bottom edge, one loud green action button per screen. Buttons and cards
+  sit on a 3D "bottom lip" instead of a soft shadow — that lip is what
+  makes the whole thing feel tappable rather than flat.
+*/
+
+:root {
+  /* sky */
+  --sky-top: #a9dcf0;
+  --sky-bottom: #d6eefa;
+  --sky-soft: #eaf6fd;
+
+  /* surfaces */
+  --card: #ffffff;
+  --card-edge: #dfe6ea;
+  --card-sunk: #f1f6f9;
+
+  /* text */
+  --text: #2f4356;
+  --text-soft: #6b8296;
+  --text-faint: #9db0c0;
+  --on-color: #ffffff;
+
+  /* the action green */
+  --green: #5cc44a;
+  --green-deep: #45a336;
+  --green-wash: #e6f7e2;
+
+  /* streak orange */
+  --orange: #f79433;
+  --orange-deep: #d97812;
+  --orange-wash: #fff0e0;
+
+  /* courage rose */
+  --rose: #ef7185;
+  --rose-deep: #cf4f64;
+  --rose-wash: #ffe9ed;
+
+  /* milestone gold */
+  --gold: #ffc63c;
+  --gold-deep: #dfa112;
+
+  /* banner blue */
+  --blue: #2aa3dd;
+  --blue-deep: #1a7fb3;
+  --blue-wash: #e3f3fc;
+
+  /* freeze lilac */
+  --lilac: #a68fd4;
+  --lilac-deep: #8570b8;
+
+  /* type */
+  --display: 'Baloo 2', 'Varela Round', system-ui, sans-serif;
+  --ui: 'Varela Round', 'Baloo 2', system-ui, sans-serif;
+
+  /* shape */
+  --r-lg: 24px;
+  --r-md: 18px;
+  --r-sm: 12px;
+  --lip: 4px;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
