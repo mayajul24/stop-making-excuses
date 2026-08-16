@@ -1,4 +1,5 @@
-import { mockMayaRewards, mockPlayer, mockSelfRewards } from '../data/mock'
+import { mockMayaRewards, mockSelfRewards } from '../data/mock'
+import { usePlayer } from '../state/playerStore'
 import './Rewards.css'
 
 /*
@@ -7,7 +8,7 @@ import './Rewards.css'
   they just prove she's earned them, so Maya has to follow through.
 */
 export function Rewards() {
-  const player = mockPlayer
+  const { player, spendCoins } = usePlayer()
 
   return (
     <div className="page rewards">
@@ -45,7 +46,11 @@ export function Rewards() {
                 <div className="selfcard__title">{r.title}</div>
                 <div className="selfcard__cost">💛 {r.cost}</div>
               </div>
-              <button className="selfcard__btn" disabled={!can}>
+              <button
+                className="selfcard__btn"
+                disabled={!can}
+                onClick={() => spendCoins(r.cost)}
+              >
                 Redeem
               </button>
             </div>

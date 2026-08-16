@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { completedCount, levelInfo } from '../lib/game'
-import { mockPlayer } from '../data/mock'
+import { usePlayer } from '../state/playerStore'
 import './Progress.css'
 
 /*
@@ -9,7 +9,7 @@ import './Progress.css'
   hoarding easy weeks, and it can't be discouraged by a slow XP climb either.
 */
 export function ProgressScreen() {
-  const player = mockPlayer
+  const { player } = usePlayer()
   const done = useMemo(() => completedCount(player), [player])
   const info = levelInfo(done)
 

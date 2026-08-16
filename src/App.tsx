@@ -4,6 +4,7 @@ import { Wins } from './screens/Wins'
 import { Rewards } from './screens/Rewards'
 import { ProgressScreen } from './screens/Progress'
 import { TabBar, type TabId } from './components/TabBar'
+import { PlayerProvider } from './state/playerStore'
 
 const SCREENS: Record<TabId, React.ComponentType> = {
   path: Home,
@@ -17,13 +18,15 @@ export default function App() {
   const Screen = SCREENS[tab]
 
   return (
-    <div className="shell">
-      <div className="app">
-        <div className="app__scroll">
-          <Screen />
+    <PlayerProvider>
+      <div className="shell">
+        <div className="app">
+          <div className="app__scroll">
+            <Screen />
+          </div>
+          <TabBar active={tab} onChange={setTab} />
         </div>
-        <TabBar active={tab} onChange={setTab} />
       </div>
-    </div>
+    </PlayerProvider>
   )
 }

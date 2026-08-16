@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { ACHIEVEMENTS, fullHistory } from '../lib/game'
-import { mockPlayer } from '../data/mock'
+import { usePlayer } from '../state/playerStore'
 import './Wins.css'
 
 /*
@@ -9,7 +9,7 @@ import './Wins.css'
   this screen can't drift out of sync with what actually unlocks things.
 */
 export function Wins() {
-  const player = mockPlayer
+  const { player } = usePlayer()
   const history = useMemo(() => fullHistory(player), [player])
 
   const unlocked = ACHIEVEMENTS.filter((a) => a.earned(history, player))

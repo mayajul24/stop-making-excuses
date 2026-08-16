@@ -1,12 +1,12 @@
 import type { MayaReward, PlayerState, SelfReward } from '../types'
 
 /*
-  Mock data stands in for the backend. Everything the UI reads comes through
-  here, so swapping in Supabase later means replacing this module's export
-  with a fetch — no component changes.
+  Mock data stands in for the backend. playerStore.tsx seeds its state from
+  this snapshot; swapping in a real backend means replacing that one seed
+  with a fetch, not touching any screen.
 */
 
-export const mockPlayer: PlayerState = {
+export const mockInitialPlayer: PlayerState = {
   xp: 240,
   coins: 95,
   streakCurrent: 6,
