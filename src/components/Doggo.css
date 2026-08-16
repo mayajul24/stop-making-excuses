@@ -10,7 +10,7 @@
 
 .doggo__tail {
   transform-box: fill-box;
-  transform-origin: 10% 90%;
+  transform-origin: 0% 100%;
 }
 
 /* Happy: tail going properly. */

@@ -15,6 +15,12 @@ export interface PathNode {
   label: string
   stars: number
   weekIndex: number
+  /**
+   * The node for the week she is standing in right now, whether it's still
+   * open, already done, or frozen. The dog parks here — including straight
+   * after she completes something, which is when she most wants company.
+   */
+  isLive?: boolean
 }
 
 /**
@@ -66,6 +72,7 @@ export function buildPath(state: PlayerState, futureCount = 2): PathNode[] {
       label: tier ? tier.done : 'DONE',
       stars: tier ? tier.stars : 0,
       weekIndex: state.weekIndex,
+      isLive: true,
     })
   } else if (state.weekStatus === 'frozen') {
     nodes.push({
@@ -74,6 +81,7 @@ export function buildPath(state: PlayerState, futureCount = 2): PathNode[] {
       label: 'ON ICE',
       stars: 0,
       weekIndex: state.weekIndex,
+      isLive: true,
     })
   } else {
     nodes.push({
@@ -82,6 +90,7 @@ export function buildPath(state: PlayerState, futureCount = 2): PathNode[] {
       label: 'YOU ARE HERE',
       stars: 0,
       weekIndex: state.weekIndex,
+      isLive: true,
     })
   }
 

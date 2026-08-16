@@ -14,7 +14,7 @@ body,
 
 body {
   margin: 0;
-  background: var(--sky-bottom);
+  background: var(--bg-bottom);
   color: var(--text);
   font-family: var(--ui);
   -webkit-font-smoothing: antialiased;
@@ -39,7 +39,12 @@ button {
   min-height: 100%;
   display: flex;
   justify-content: center;
-  background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 46%, var(--sky-soft) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--bg-top) 0%,
+    var(--bg-mid) 45%,
+    var(--bg-bottom) 100%
+  );
   background-attachment: fixed;
 }
 
@@ -88,11 +93,11 @@ button {
 }
 
 .pill--streak {
-  color: var(--orange-deep);
+  color: var(--orange-soft);
 }
 
 .pill--courage {
-  color: var(--rose-deep);
+  color: var(--rose-soft);
 }
 
 /* The one loud button per screen. */
@@ -157,12 +162,6 @@ button {
 
 .btn-quiet:active {
   transform: translateY(2px);
-}
-
-/* Hebrew copy is always RTL. */
-.heb {
-  direction: rtl;
-  text-align: right;
 }
 
 /* ---------------------------------------------------------------

@@ -1,8 +1,8 @@
 import type { PlayerState } from '../types'
 
 /*
-  The voice. English for the punchlines, Hebrew for anything that explains —
-  that split is the house style and it stays.
+  The voice: her blunt best friend. Warm, funny, never motivational-poster.
+  Celebrates showing up, never romantic outcomes.
 */
 
 export type Mood = 'idle' | 'smug' | 'unimpressed' | 'proud'
@@ -10,29 +10,27 @@ export type Mood = 'idle' | 'smug' | 'unimpressed' | 'proud'
 export type Tone = 'calm' | 'urgent' | 'win'
 
 export interface HomeVoice {
-  /** English punchline in the banner. */
   bannerTitle: string
-  /** Hebrew line under it. */
   bannerSub: string
   bannerTone: Tone
-  /** What the dog says next to the active step. */
+  /** What the dog says next to the live step. */
   dogLine: string
   dogMood: Mood
 }
 
 const DOG_IDLE = [
-  'בואי נעשה משהו קטן 🐾',
-  'זה הרגע שלך 🐾',
-  'מוכנה? 🐾',
+  'Ready? 🐾',
+  'One small thing. That’s it 🐾',
+  'This is your moment 🐾',
 ]
 
 const DOG_NAGGING = [
-  'אל תשברי את הרצף! 😈',
-  'איפה נעלמת? 👀',
-  'לא מוצאים בעל מהספה 😂',
+  'Don’t break the streak 😈',
+  'Where did you go? 👀',
+  'Not from the couch, queen 😂',
 ]
 
-const DOG_PROUD = ['גאה בך 🐾', 'תראי אותך!', 'איזה כיף!']
+const DOG_PROUD = ['Proud of you 🐾', 'Look at you!', 'See? Not so bad.']
 
 /** Deterministic pick so copy doesn't reshuffle on every re-render. */
 function pick(list: string[], seed: number): string {
@@ -45,7 +43,7 @@ export function homeVoice(state: PlayerState, daysLeft: number): HomeVoice {
   if (state.weekStatus === 'done') {
     return {
       bannerTitle: 'HOLY SHIT YOU ACTUALLY DID IT',
-      bannerSub: `${state.streakCurrent} שבועות ברצף. מאיה קיבלה עדכון 👀`,
+      bannerSub: `${state.streakCurrent} weeks in a row. Maya has been notified 👀`,
       bannerTone: 'win',
       dogLine: pick(DOG_PROUD, seed),
       dogMood: 'proud',
@@ -55,9 +53,9 @@ export function homeVoice(state: PlayerState, daysLeft: number): HomeVoice {
   if (state.weekStatus === 'frozen') {
     return {
       bannerTitle: 'WEEK ON ICE ❄️',
-      bannerSub: 'הרצף שלך נשמר. נתראה שבוע הבא.',
+      bannerSub: 'Your streak is safe. See you next week.',
       bannerTone: 'calm',
-      dogLine: 'שבוע רגוע ❄️',
+      dogLine: 'Resting is allowed ❄️',
       dogMood: 'idle',
     }
   }
@@ -65,9 +63,9 @@ export function homeVoice(state: PlayerState, daysLeft: number): HomeVoice {
   if (state.streakCurrent >= 1 && daysLeft <= 2) {
     return {
       bannerTitle: '🚨 Your dating streak is about to die.',
-      bannerSub: `🔥 ${state.streakCurrent} שבועות ברצף · פג בעוד ${
-        daysLeft === 1 ? 'יום' : `${daysLeft} ימים`
-      }.`,
+      bannerSub: `🔥 ${state.streakCurrent} weeks in a row · ${
+        daysLeft === 1 ? '1 day' : `${daysLeft} days`
+      } left.`,
       bannerTone: 'urgent',
       dogLine: pick(DOG_NAGGING, seed),
       dogMood: 'unimpressed',
@@ -77,10 +75,10 @@ export function homeVoice(state: PlayerState, daysLeft: number): HomeVoice {
   const trailing = state.history.slice(-3)
   if (trailing.length === 3 && trailing.every((w) => w.status === 'missed')) {
     return {
-      bannerTitle: 'You spent 3 weeks saying "maybe next week".',
+      bannerTitle: 'You spent 3 weeks saying “maybe next week”.',
       bannerSub: 'This is your villain origin story.',
       bannerTone: 'urgent',
-      dogLine: 'בואי נשבור את הקללה 🐾',
+      dogLine: 'Let’s break the curse 🐾',
       dogMood: 'unimpressed',
     }
   }
@@ -89,11 +87,11 @@ export function homeVoice(state: PlayerState, daysLeft: number): HomeVoice {
     bannerTitle:
       state.streakCurrent > 0
         ? `🔥 ${state.streakCurrent} weeks of showing up`
-        : "Okay queen, we're not finding a husband from the couch 😂",
+        : 'Okay queen, we’re not finding a husband from the couch 😂',
     bannerSub:
       state.streakCurrent > 0
-        ? 'שבוע חדש, משימה אחת. בואי נמשיך.'
-        : 'שבוע ראשון. אין מה להפסיד.',
+        ? 'New week, one mission. Let’s keep going.'
+        : 'Week one. Nothing to lose.',
     bannerTone: 'calm',
     dogLine: pick(DOG_IDLE, seed),
     dogMood: state.streakCurrent >= 4 ? 'smug' : 'idle',

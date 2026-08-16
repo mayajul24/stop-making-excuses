@@ -17,6 +17,24 @@ export function Home() {
   const suggested = bestAffordable(player)
   const tier = suggested ? TIERS[suggested] : null
 
+  /*
+    One action, and it has to match the state of the week. A finished week
+    must not still be shouting "next step" at her — that reads as though
+    what she just did didn't count.
+  */
+  function renderAction() {
+    if (player.weekStatus === 'done') {
+      return <div className="done-note">Week complete ✓ &nbsp;See you next week.</div>
+    }
+    if (player.weekStatus === 'frozen') {
+      return <div className="done-note">Week on ice ❄️ &nbsp;Streak protected.</div>
+    }
+    if (!tier) {
+      return <button className="btn btn--rose">💗 OUT OF COURAGE — REFILL</button>
+    }
+    return <button className="btn">NEXT STEP: {tier.action}</button>
+  }
+
   return (
     <div className="page home">
       <header className="topbar">
@@ -32,22 +50,14 @@ export function Home() {
 
       <div className={`banner banner--${voice.bannerTone} rise`}>
         <strong className="banner__title">{voice.bannerTitle}</strong>
-        <span className="banner__sub heb">{voice.bannerSub}</span>
+        <span className="banner__sub">{voice.bannerSub}</span>
       </div>
 
       <div className="home__scroll">
         <Path nodes={nodes} dogLine={voice.dogLine} dogMood={voice.dogMood} />
       </div>
 
-      <div className="home__dock">
-        {tier ? (
-          <button className="btn">NEXT STEP: {tier.action}</button>
-        ) : (
-          <button className="btn btn--rose">
-            💗 OUT OF COURAGE — REFILL
-          </button>
-        )}
-      </div>
+      <div className="home__dock">{renderAction()}</div>
     </div>
   )
 }

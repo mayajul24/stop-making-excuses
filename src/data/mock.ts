@@ -29,7 +29,10 @@ export const mockPlayer: PlayerState = {
     { weekIndex: 7, status: 'done', difficulty: 'nightmare', xp: 50, reaction: 'great_date' },
   ],
   reflections: [
-    { ts: Date.now() - 6 * 864e5, text: 'הוא היה נמוך מהתמונות אבל בסדר.' },
+    {
+      ts: Date.now() - 6 * 864e5,
+      text: 'He was shorter than his photos but honestly fine.',
+    },
   ],
 }
 

@@ -1,56 +1,64 @@
 /*
   Design tokens — "סתמי ותזדייני"
 
-  Friendly, rounded, bright. Sky-blue paper, white cards with a chunky
-  bottom edge, one loud green action button per screen. Buttons and cards
-  sit on a 3D "bottom lip" instead of a soft shadow — that lip is what
-  makes the whole thing feel tappable rather than flat.
+  Dark, friendly, rounded. Deep blue-charcoal ground, raised surfaces, and
+  saturated accents that hold up against it. Buttons and cards sit on a
+  chunky bottom lip instead of a soft shadow — that lip is what makes the
+  whole thing feel tappable rather than flat.
 */
 
 :root {
-  /* sky */
-  --sky-top: #a9dcf0;
-  --sky-bottom: #d6eefa;
-  --sky-soft: #eaf6fd;
+  color-scheme: dark;
 
-  /* surfaces */
-  --card: #ffffff;
-  --card-edge: #dfe6ea;
-  --card-sunk: #f1f6f9;
+  /* ground */
+  --bg-top: #16212e;
+  --bg-mid: #121b26;
+  --bg-bottom: #0e161f;
+
+  /* raised surfaces */
+  --card: #1e2c3a;
+  --card-edge: #2b3d4e;
+  --card-sunk: #1a2733;
 
   /* text */
-  --text: #2f4356;
-  --text-soft: #6b8296;
-  --text-faint: #9db0c0;
+  --text: #eaf2f8;
+  --text-soft: #9db2c4;
+  --text-faint: #6b8199;
   --on-color: #ffffff;
 
   /* the action green */
-  --green: #5cc44a;
-  --green-deep: #45a336;
-  --green-wash: #e6f7e2;
+  --green: #58cc4a;
+  --green-deep: #3d9632;
+  --green-soft: #9ce68f;
+  --green-wash: rgba(88, 204, 74, 0.13);
+  --green-line: rgba(88, 204, 74, 0.38);
 
   /* streak orange */
-  --orange: #f79433;
-  --orange-deep: #d97812;
-  --orange-wash: #fff0e0;
+  --orange: #ff9a3c;
+  --orange-deep: #d9761a;
+  --orange-soft: #ffbe80;
+  --orange-wash: rgba(255, 154, 60, 0.13);
+  --orange-line: rgba(255, 154, 60, 0.38);
 
   /* courage rose */
-  --rose: #ef7185;
+  --rose: #f4788c;
   --rose-deep: #cf4f64;
-  --rose-wash: #ffe9ed;
+  --rose-soft: #ffa8b6;
 
   /* milestone gold */
-  --gold: #ffc63c;
-  --gold-deep: #dfa112;
+  --gold: #ffc93c;
+  --gold-deep: #d9a012;
 
   /* banner blue */
-  --blue: #2aa3dd;
-  --blue-deep: #1a7fb3;
-  --blue-wash: #e3f3fc;
+  --blue: #3fb0e8;
+  --blue-deep: #2183b5;
+  --blue-soft: #8ed6f7;
+  --blue-wash: rgba(63, 176, 232, 0.13);
+  --blue-line: rgba(63, 176, 232, 0.38);
 
   /* freeze lilac */
-  --lilac: #a68fd4;
-  --lilac-deep: #8570b8;
+  --lilac: #a78be8;
+  --lilac-deep: #7d5fc4;
 
   /* type */
   --display: 'Baloo 2', 'Varela Round', system-ui, sans-serif;

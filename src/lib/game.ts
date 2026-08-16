@@ -17,9 +17,9 @@ export interface Tier {
   action: string
   /** Past tense, for a completed node on the journey. */
   done: string
-  /** Hebrew explanation — always the quieter voice. */
+  /** Why it's worth doing — the quieter, reassuring voice. */
   why: string
-  /** Hebrew step-by-step, shown once she's committed to the mission. */
+  /** Step-by-step, shown once she's committed to the mission. */
   steps: string[]
   xp: number
   courage: number
@@ -33,11 +33,11 @@ export const TIERS: Record<Difficulty, Tier> = {
     headline: 'OPEN THE APP',
     action: 'OPEN THE APP',
     done: 'OPENED THE APP',
-    why: 'לא צריך לכתוב כלום. לפתוח, לגלול, לעשות לייק לאחד. זהו. השבוע נסגר.',
+    why: 'You don’t have to write anything. Open it, scroll, like one person. Week closed.',
     steps: [
-      'לפתוח את אפליקציית ההיכרויות',
-      'לגלול שלושים שניות',
-      'לייק לאחד — בלי לחשוב יותר מדי',
+      'Open the dating app',
+      'Scroll for thirty seconds',
+      'Like one person — don’t overthink it',
     ],
     xp: 5,
     courage: 1,
@@ -49,11 +49,11 @@ export const TIERS: Record<Difficulty, Tier> = {
     headline: 'SEND A MESSAGE',
     action: 'SEND A MESSAGE',
     done: 'SENT A MESSAGE',
-    why: 'את לא צריכה למצוא בעל. את צריכה לדבר עם בן אדם אחד.',
+    why: 'You don’t need to find a husband. You need to talk to one human being.',
     steps: [
-      'לבחור מאצ׳ אחד',
-      'לכתוב משהו אמיתי — לא "היי"',
-      'לשלוח לפני שאת עורכת את זה בפעם החמישית',
+      'Pick one match',
+      'Write something real — not “hey”',
+      'Send it before you edit it a fifth time',
     ],
     xp: 15,
     courage: 1,
@@ -65,11 +65,11 @@ export const TIERS: Record<Difficulty, Tier> = {
     headline: 'ASK HIM OUT',
     action: 'ASK HIM OUT',
     done: 'ASKED HIM OUT',
-    why: 'הכי גרוע שיקרה זה "לא". והכי גרוע שקורה אחרי "לא" זה כלום.',
+    why: 'Worst case is “no”. And the worst thing that happens after a no is nothing.',
     steps: [
-      'לוודא שהשיחה בכלל זורמת',
-      'להציע משהו קונקרטי: מקום, יום, שעה',
-      'לשלוח',
+      'Check the conversation is actually flowing',
+      'Suggest something concrete: place, day, time',
+      'Send it',
     ],
     xp: 30,
     courage: 2,
@@ -81,12 +81,8 @@ export const TIERS: Record<Difficulty, Tier> = {
     headline: 'GO ON A DATE',
     action: 'GO ON A DATE',
     done: 'WENT ON A DATE',
-    why: 'תשעים דקות. מקום ציבורי. מותר לך לברוח אחרי.',
-    steps: [
-      'לבחור מקום ציבורי',
-      'לספר למאיה מתי ואיפה',
-      'ללכת',
-    ],
+    why: 'Ninety minutes. Public place. You’re allowed to leave after.',
+    steps: ['Pick a public place', 'Tell Maya when and where', 'Go'],
     xp: 50,
     courage: 3,
     stars: 3,
@@ -146,63 +142,63 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'first_message',
     title: 'SENT THE FIRST MESSAGE',
-    blurb: 'כתבת ראשונה. זה החלק הכי קשה והוא מאחורייך.',
+    blurb: 'You wrote first. That’s the hardest part and it’s behind you.',
     emoji: '🫡',
     earned: (h) => hasDifficulty(h, ['medium', 'hard', 'nightmare']),
   },
   {
     id: 'asked_out',
     title: 'ASKED HIM OUT',
-    blurb: 'הצעת. בקול. כמו אדם בוגר.',
+    blurb: 'You asked. Out loud. Like an adult.',
     emoji: '🫣',
     earned: (h) => hasDifficulty(h, ['hard', 'nightmare']),
   },
   {
     id: 'bad_date',
     title: 'SURVIVED A BAD DATE',
-    blurb: 'היה נורא. חזרת הביתה. עדיין כאן.',
+    blurb: 'It was awful. You went home. Still standing.',
     emoji: '💀',
     earned: (h) => hasReaction(h, 'rough'),
   },
   {
     id: 'ghosted',
     title: 'REJECTED A GHOSTER',
-    blurb: 'הוא נעלם. את המשכת. הוא הפסיד.',
+    blurb: 'He vanished. You kept going. He lost.',
     emoji: '👻',
     earned: (h) => hasReaction(h, 'ghosted'),
   },
   {
     id: 'anyway',
     title: 'WENT ANYWAY',
-    blurb: 'היית בלחץ והלכת בכל זאת.',
+    blurb: 'You were terrified and you went anyway.',
     emoji: '💅',
     earned: (h) => hasDifficulty(h, ['nightmare']),
   },
   {
     id: 'second_date',
     title: 'SECOND DATE UNLOCKED',
-    blurb: 'מישהו רוצה לראות אותך שוב. תארי לעצמך.',
+    blurb: 'Someone wants to see you again. Imagine that.',
     emoji: '❤️',
     earned: (h) => hasReaction(h, 'second_date'),
   },
   {
     id: 'streak4',
     title: '4-WEEK STREAK',
-    blurb: 'ארבעה שבועות שהופעת.',
+    blurb: 'Four weeks of showing up.',
     emoji: '🔥',
     earned: (_h, s) => s.streakLongest >= 4,
   },
   {
     id: 'coward',
     title: 'COWARD MODE GRADUATE',
-    blurb: 'ירדת רמה במקום להיעלם. זה נחשב.',
+    blurb: 'You dropped a level instead of disappearing. That counts.',
     emoji: '🐣',
     earned: (_h, s) => s.cowardUsed,
   },
   {
     id: 'streak8',
     title: '8-WEEK STREAK',
-    blurb: 'שמונה שבועות. זה כבר לא מקרי.',
+    blurb: 'Eight weeks. That’s not an accident anymore.',
     emoji: '👑',
     earned: (_h, s) => s.streakLongest >= 8,
   },

@@ -53,7 +53,7 @@ export function Path({
           <div
             className="path__step"
             key={node.key}
-            ref={node.kind === 'current' ? liveStep : undefined}
+            ref={node.isLive ? liveStep : undefined}
           >
             <div
               className="path__slot"
@@ -71,13 +71,13 @@ export function Path({
                 <div className="path__stars">{'★'.repeat(node.stars)}</div>
               )}
 
-              {node.kind === 'current' && (
+              {node.isLive && (
                 <div
                   className="path__dog"
                   data-side={offset > 0 ? 'left' : 'right'}
                 >
                   <Doggo mood={dogMood} size={72} />
-                  <div className="path__bubble heb">{dogLine}</div>
+                  <div className="path__bubble">{dogLine}</div>
                 </div>
               )}
             </div>
