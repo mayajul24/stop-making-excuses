@@ -300,7 +300,7 @@
   text-align: center;
 }
 
-.scarytoggle {
+.anxioustoggle {
   text-align: left;
   background: var(--card-sunk);
   border: 1.5px dashed var(--card-edge);
@@ -312,7 +312,7 @@
   line-height: 1.4;
 }
 
-.scarytoggle--done {
+.anxioustoggle--done {
   border-style: solid;
   border-color: var(--gold-deep);
   background: rgba(255, 200, 0, 0.1);

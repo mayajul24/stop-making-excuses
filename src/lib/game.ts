@@ -46,7 +46,7 @@ export const TIERS: Record<Difficulty, Tier> = {
   },
   medium: {
     id: 'medium',
-    rank: '😬 A LITTLE SCARY',
+    rank: '😬 A LITTLE ANXIOUS',
     headline: 'SEND A MESSAGE',
     action: 'SEND A MESSAGE',
     done: 'SENT A MESSAGE',

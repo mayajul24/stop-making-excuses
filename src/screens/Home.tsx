@@ -35,7 +35,7 @@ export function Home() {
     markDone,
     freezeWeek,
     chooseEasier,
-    markScary,
+    markAnxious,
     refillCourage,
     setReaction,
     addReflection,
@@ -45,7 +45,7 @@ export function Home() {
   const voice = useMemo(() => homeVoice(player, daysLeft), [player, daysLeft])
   const nodes = useMemo(() => buildPath(player), [player])
 
-  // A session-only override so ⇄ and "I'm scared" can change which tier is
+  // A session-only override so ⇄ and "I'm anxious" can change which tier is
   // offered without touching committed state — nothing is written to the
   // player until she actually taps DONE.
   const [override, setOverride] = useState<Difficulty | null>(null)
@@ -67,10 +67,10 @@ export function Home() {
     setEasierBanner(false)
   }
 
-  // The "I'm scared" branch — steps down exactly one rung from whatever's
+  // The "I'm anxious" branch — steps down exactly one rung from whatever's
   // currently offered rather than always jumping to a fixed tier, so it
   // stays "a little smaller" instead of overcorrecting to the floor.
-  function handleScared() {
+  function handleAnxious() {
     chooseEasier()
     const affordable = TIER_ORDER.filter((d) => canAfford(player, d))
     const current = selected ?? affordable[0]
@@ -102,8 +102,8 @@ export function Home() {
         <div className="donepanel rise">
           <div className="donepanel__head">
             <span className="donepanel__title">
-              {player.weekMarkedScary
-                ? '😬 Scared, and did it anyway.'
+              {player.weekMarkedAnxious
+                ? '😬 Anxious, and did it anyway.'
                 : 'That counts.'}
             </span>
             <span className="donepanel__sub">
@@ -112,12 +112,13 @@ export function Home() {
             </span>
           </div>
 
-          {!player.weekMarkedScary ? (
-            <button className="scarytoggle" onClick={markScary}>
-              😰 Honestly? That felt scary — claim +{10} bonus Courage
+          {!player.weekMarkedAnxious ? (
+            <button className="anxioustoggle" onClick={markAnxious}>
+              😰 Honestly? I felt anxious about this — claim +{10} bonus
+              Courage
             </button>
           ) : (
-            <div className="scarytoggle scarytoggle--done">
+            <div className="anxioustoggle anxioustoggle--done">
               😬 Bonus Courage claimed. You didn’t need to conquer dating
               today — one tiny win is the whole point.
             </div>
@@ -187,8 +188,8 @@ export function Home() {
           <button className="secondary-btn" onClick={refillCourage}>
             👀 Free look +1
           </button>
-          <button className="secondary-btn" onClick={handleScared}>
-            😨 I'm scared
+          <button className="secondary-btn" onClick={handleAnxious}>
+            😰 I'm anxious
           </button>
           <button
             className="secondary-btn"
