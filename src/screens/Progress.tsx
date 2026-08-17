@@ -3,6 +3,7 @@ import { completedCount, levelInfo } from '../lib/game'
 import { daysIntoWeek } from '../lib/calendar'
 import { nextPushNotification } from '../lib/notifications'
 import { usePlayer } from '../state/playerStore'
+import { PushToggle } from '../components/PushToggle'
 import './Progress.css'
 
 function fmtDate(ts: number) {
@@ -94,21 +95,20 @@ export function ProgressScreen() {
       )}
 
       <div className="pushpreview">
-        <span className="label">🔔 If push were live right now</span>
+        <span className="label">🔔 Notifications</span>
+        <PushToggle />
         {preview ? (
           <div className="pushpreview__card">
-            <span className="pushpreview__title">{preview.title}</span>
+            <span className="pushpreview__title">
+              What tonight's would say
+            </span>
             <span className="pushpreview__body">{preview.body}</span>
           </div>
         ) : (
           <p className="pushpreview__quiet">
-            Nothing right now — she's good.
+            Nothing to send right now — she's good.
           </p>
         )}
-        <p className="pushpreview__note">
-          Preview only. Actually sending this to her phone needs a backend
-          that doesn't exist yet.
-        </p>
       </div>
 
       <button

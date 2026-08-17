@@ -11,6 +11,7 @@ import type { Difficulty, PlayerState, Reaction } from '../types'
 import { COURAGE_MAX, FREEZE_MAX, TIERS } from '../lib/game'
 import { currentWeekIndex } from '../lib/calendar'
 import { mockInitialPlayer } from '../data/mock'
+import { supabase } from '../lib/supabaseClient'
 
 const STORAGE_KEY = 'stami:player'
 
@@ -111,6 +112,18 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       // Private-browsing / storage-full: the session still works, it just
       // won't survive a reload. Not worth surfacing to her over this.
     }
+
+    // Mirrored to Supabase, fire-and-forget, so the nightly cron job (which
+    // runs server-side with no access to this browser's localStorage) has
+    // something current to read. localStorage stays the source of truth
+    // for the browser itself — this is a write-through sync, not a two-way
+    // one; the app doesn't read its own state back from Supabase.
+    supabase
+      ?.from('player_state')
+      .upsert({ id: 1, data: player, updated_at: new Date().toISOString() })
+      .then(({ error }) => {
+        if (error) console.error('player_state sync failed', error)
+      })
   }, [player])
 
   const markDone = useCallback((difficulty: Difficulty) => {

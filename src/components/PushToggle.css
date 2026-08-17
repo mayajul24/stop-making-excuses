@@ -1,0 +1,38 @@
+.pushtoggle {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pushtoggle__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.pushtoggle__label {
+  font-size: 12.5px;
+  color: var(--text-soft);
+  line-height: 1.4;
+}
+
+.pushtoggle__btn {
+  flex-shrink: 0;
+  background: var(--card-edge);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 11.5px;
+  padding: 7px 12px;
+  border-radius: var(--r-sm);
+  white-space: nowrap;
+}
+
+.pushtoggle__btn:disabled {
+  opacity: 0.5;
+}
+
+.pushtoggle__error {
+  font-size: 11px;
+  color: var(--rose);
+}
