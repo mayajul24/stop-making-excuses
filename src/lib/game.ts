@@ -62,9 +62,9 @@ export const TIERS: Record<Difficulty, Tier> = {
   hard: {
     id: 'hard',
     rank: 'HARD',
-    headline: 'ASK HIM OUT',
-    action: 'ASK HIM OUT',
-    done: 'ASKED HIM OUT',
+    headline: 'ASK SOMEONE OUT',
+    action: 'ASK SOMEONE OUT',
+    done: 'ASKED SOMEONE OUT',
     why: 'Worst case is “no”. And the worst thing that happens after a no is nothing.',
     steps: [
       'Check the conversation is actually flowing',
@@ -135,6 +135,9 @@ export interface Achievement {
 const hasDifficulty = (h: WeekRecord[], list: Difficulty[]) =>
   h.some((w) => w.difficulty !== null && list.includes(w.difficulty))
 
+const countDifficulty = (h: WeekRecord[], list: Difficulty[]) =>
+  h.filter((w) => w.difficulty !== null && list.includes(w.difficulty)).length
+
 const hasReaction = (h: WeekRecord[], r: Reaction) =>
   h.some((w) => w.reaction === r)
 
@@ -148,10 +151,12 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: 'asked_out',
-    title: 'ASKED HIM OUT',
-    blurb: 'You asked. Out loud. Like an adult.',
+    title: 'ASKED PEOPLE OUT',
+    blurb: 'Not just once. You’ve got a system now.',
     emoji: '🫣',
-    earned: (h) => hasDifficulty(h, ['hard', 'nightmare']),
+    // A single ask used to be enough — bumped to 3 so this reads as a real
+    // pattern, not a one-off spike of courage.
+    earned: (h) => countDifficulty(h, ['hard', 'nightmare']) >= 3,
   },
   {
     id: 'bad_date',
@@ -163,7 +168,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'ghosted',
     title: 'REJECTED A GHOSTER',
-    blurb: 'He vanished. You kept going. He lost.',
+    blurb: 'They vanished. You kept going. They lost.',
     emoji: '👻',
     earned: (h) => hasReaction(h, 'ghosted'),
   },
@@ -232,10 +237,16 @@ export function canAfford(s: PlayerState, d: Difficulty): boolean {
   return s.courage >= TIERS[d].courage
 }
 
-/** The hardest tier she can still pay for this week. */
-export function bestAffordable(s: PlayerState): Difficulty | null {
-  for (let i = TIER_ORDER.length - 1; i >= 0; i--) {
-    if (canAfford(s, TIER_ORDER[i])) return TIER_ORDER[i]
+/**
+ * The gentlest tier she can still pay for this week — the default offer.
+ * Escalating to something harder is something she opts into via ⇄, not the
+ * thing she's handed by default. (At full courage, Nightmare is technically
+ * affordable on its own cost — defaulting to "go on a date" as week one's
+ * suggestion would undercut the whole point of the courage gate.)
+ */
+export function easiestAffordable(s: PlayerState): Difficulty | null {
+  for (const d of TIER_ORDER) {
+    if (canAfford(s, d)) return d
   }
   return null
 }

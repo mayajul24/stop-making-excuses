@@ -90,21 +90,10 @@
   color: var(--text-faint);
 }
 
-.progressScreen__notesLabel {
-  margin-top: 4px;
-}
-
-.notelist {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.note {
-  background: var(--card-sunk);
-  border-radius: var(--r-sm);
-  padding: 11px 13px;
-  font-size: 13px;
-  color: var(--text-soft);
-  line-height: 1.45;
+.resetlink {
+  margin: 8px auto 0;
+  font-size: 11.5px;
+  color: var(--text-faint);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }

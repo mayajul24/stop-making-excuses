@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
 import type { Difficulty, Reaction } from '../types'
-import { TIER_ORDER, TIERS, bestAffordable, canAfford } from '../lib/game'
+import { TIER_ORDER, TIERS, canAfford, easiestAffordable } from '../lib/game'
 import { buildPath } from '../lib/path'
 import { homeVoice } from '../lib/voice'
-import { mockDaysLeft } from '../data/mock'
+import { daysLeftInWeek } from '../lib/calendar'
 import { usePlayer } from '../state/playerStore'
 import { Path } from '../components/Path'
 import './Home.css'
@@ -38,20 +38,22 @@ export function Home() {
     refillCourage,
     setReaction,
     addReflection,
-    rollToNextWeek,
   } = usePlayer()
 
-  const voice = useMemo(() => homeVoice(player, mockDaysLeft), [player])
+  const daysLeft = useMemo(() => daysLeftInWeek(), [])
+  const voice = useMemo(() => homeVoice(player, daysLeft), [player, daysLeft])
   const nodes = useMemo(() => buildPath(player), [player])
 
   // A session-only override so ⇄ and Coward Mode can change which tier is
   // offered without touching committed state — nothing is written to the
-  // player until she actually taps START.
+  // player until she actually taps DONE.
   const [override, setOverride] = useState<Difficulty | null>(null)
   const [cowardBanner, setCowardBanner] = useState(false)
   const [reflectionText, setReflectionText] = useState('')
 
-  const suggested = bestAffordable(player)
+  // Defaults to the gentlest thing she can afford, not the hardest — ⇄ is
+  // how she opts into something bigger.
+  const suggested = easiestAffordable(player)
   const selected = override ?? suggested
   const tier = selected ? TIERS[selected] : null
 
@@ -70,17 +72,11 @@ export function Home() {
     setCowardBanner(true)
   }
 
-  function handleStart() {
+  function handleMarkDone() {
     if (!selected) return
     markDone(selected)
     setOverride(null)
-  }
-
-  function handleContinue() {
-    rollToNextWeek()
-    setOverride(null)
     setCowardBanner(false)
-    setReflectionText('')
   }
 
   function handleSaveReflection() {
@@ -130,9 +126,9 @@ export function Home() {
             </button>
           )}
 
-          <button className="continuebtn" onClick={handleContinue}>
-            Continue to next week →
-          </button>
+          <p className="nextweeknote">
+            Next week opens on its own once this one's really over.
+          </p>
         </div>
       )
     }
@@ -142,9 +138,6 @@ export function Home() {
         <div className="donepanel donepanel--frozen rise">
           <span className="donepanel__title">Week on ice ❄️</span>
           <span className="donepanel__sub">Streak protected.</span>
-          <button className="continuebtn" onClick={handleContinue}>
-            Continue to next week →
-          </button>
         </div>
       )
     }
@@ -187,8 +180,8 @@ export function Home() {
           </span>
           <span className="misscard__title">{tier.headline}</span>
           <div className="misscard__row">
-            <button className="misscard__pill" onClick={handleStart}>
-              START
+            <button className="misscard__pill" onClick={handleMarkDone}>
+              DONE ✓
             </button>
             {TIER_ORDER.filter((d) => canAfford(player, d)).length > 1 && (
               <button
@@ -201,9 +194,6 @@ export function Home() {
             )}
           </div>
         </div>
-        <button className="skiplink" onClick={handleContinue}>
-          Skip this week anyway (testing) →
-        </button>
       </>
     )
   }

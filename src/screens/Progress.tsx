@@ -9,7 +9,7 @@ import './Progress.css'
   hoarding easy weeks, and it can't be discouraged by a slow XP climb either.
 */
 export function ProgressScreen() {
-  const { player } = usePlayer()
+  const { player, resetAll } = usePlayer()
   const done = useMemo(() => completedCount(player), [player])
   const info = levelInfo(done)
 
@@ -57,20 +57,14 @@ export function ProgressScreen() {
         </div>
       </div>
 
-      {player.reflections.length > 0 && (
-        <>
-          <span className="label progressScreen__notesLabel">
-            Recent thoughts
-          </span>
-          <div className="notelist">
-            {player.reflections.slice(0, 5).map((r) => (
-              <div className="note" key={r.ts}>
-                {r.text}
-              </div>
-            ))}
-          </div>
-        </>
-      )}
+      <button
+        className="resetlink"
+        onClick={() => {
+          if (confirm('Reset all progress? This can’t be undone.')) resetAll()
+        }}
+      >
+        Reset progress
+      </button>
     </div>
   )
 }

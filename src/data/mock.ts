@@ -1,43 +1,28 @@
 import type { MayaReward, PlayerState, SelfReward } from '../types'
+import { COURAGE_MAX, FREEZE_MAX } from '../lib/game'
 
 /*
   Mock data stands in for the backend. playerStore.tsx seeds its state from
-  this snapshot; swapping in a real backend means replacing that one seed
-  with a fetch, not touching any screen.
+  this snapshot for a brand-new player; weekIndex gets overwritten with the
+  real current calendar week at seed time, not the placeholder below.
 */
 
 export const mockInitialPlayer: PlayerState = {
-  xp: 240,
-  coins: 95,
-  streakCurrent: 6,
-  streakLongest: 6,
-  weeksActive: 6,
-  freezeTokens: 2,
-  courage: 2,
-  weekIndex: 8,
+  xp: 0,
+  coins: 0,
+  streakCurrent: 0,
+  streakLongest: 0,
+  weeksActive: 0,
+  freezeTokens: Math.min(2, FREEZE_MAX),
+  courage: COURAGE_MAX,
+  weekIndex: 1,
   weekStatus: 'open',
   weekDifficulty: null,
   weekReaction: null,
-  cowardUsed: true,
-  history: [
-    { weekIndex: 1, status: 'done', difficulty: 'easy', xp: 5, reaction: null },
-    { weekIndex: 2, status: 'missed', difficulty: null, xp: 0, reaction: null },
-    { weekIndex: 3, status: 'done', difficulty: 'medium', xp: 15, reaction: null },
-    { weekIndex: 4, status: 'done', difficulty: 'medium', xp: 15, reaction: 'awkward' },
-    { weekIndex: 5, status: 'frozen', difficulty: null, xp: 0, reaction: null },
-    { weekIndex: 6, status: 'done', difficulty: 'hard', xp: 30, reaction: null },
-    { weekIndex: 7, status: 'done', difficulty: 'nightmare', xp: 50, reaction: 'great_date' },
-  ],
-  reflections: [
-    {
-      ts: Date.now() - 6 * 864e5,
-      text: 'He was shorter than his photos but honestly fine.',
-    },
-  ],
+  cowardUsed: false,
+  history: [],
+  reflections: [],
 }
-
-/** Days left in the current week — at 2 or fewer the voice starts nagging. */
-export const mockDaysLeft = 5
 
 export const mockSelfRewards: SelfReward[] = [
   { id: 'r1', title: 'A nice coffee or a treat', cost: 20 },

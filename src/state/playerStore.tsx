@@ -2,20 +2,24 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from 'react'
 import type { Difficulty, PlayerState, Reaction } from '../types'
 import { COURAGE_MAX, FREEZE_MAX, TIERS } from '../lib/game'
+import { currentWeekIndex } from '../lib/calendar'
 import { mockInitialPlayer } from '../data/mock'
+
+const STORAGE_KEY = 'stami:player'
 
 /*
   Every mutation the app can make to a PlayerState, in one place. This is
-  local React state today; the point of keeping every write behind these
-  functions rather than scattered setState calls is that swapping in a real
-  backend later means rewriting this file's insides, not every screen that
-  touches the player.
+  local state persisted to localStorage today; the point of keeping every
+  write behind these functions rather than scattered setState calls is that
+  swapping in a real backend later means rewriting this file's insides, not
+  every screen that touches the player.
 */
 interface PlayerActions {
   markDone: (difficulty: Difficulty) => void
@@ -25,7 +29,6 @@ interface PlayerActions {
   setReaction: (r: Reaction) => void
   addReflection: (text: string) => void
   spendCoins: (amount: number) => boolean
-  rollToNextWeek: () => void
   resetAll: () => void
 }
 
@@ -33,8 +36,78 @@ const PlayerContext = createContext<
   { player: PlayerState } & PlayerActions
 >(null as never)
 
+/** A brand-new player, anchored to whatever the real current week is. */
+function freshPlayer(): PlayerState {
+  return { ...mockInitialPlayer, weekIndex: currentWeekIndex() }
+}
+
+/**
+ * Archives one week and opens the next — pure, so it can run in a loop to
+ * catch up several real weeks at once (the app closed for a while) without
+ * duplicating this logic in a UI action. A week left open resolves to
+ * 'missed', which is what breaks the streak.
+ *
+ * Freeze regenerates every two week-transitions, matching the "every two
+ * weeks, not every week" spec, approximated with weekIndex parity — good
+ * enough without a scheduled job counting real elapsed weeks.
+ */
+function advanceWeek(s: PlayerState): PlayerState {
+  const resolvedStatus = s.weekStatus === 'open' ? 'missed' : s.weekStatus
+  const streakBroken = resolvedStatus === 'missed'
+  return {
+    ...s,
+    history: [
+      ...s.history,
+      {
+        weekIndex: s.weekIndex,
+        status: resolvedStatus,
+        difficulty: s.weekDifficulty,
+        xp: s.weekDifficulty ? TIERS[s.weekDifficulty].xp : 0,
+        reaction: s.weekReaction,
+      },
+    ],
+    weekIndex: s.weekIndex + 1,
+    weekStatus: 'open',
+    weekDifficulty: null,
+    weekReaction: null,
+    streakCurrent: streakBroken ? 0 : s.streakCurrent,
+    courage: Math.min(COURAGE_MAX, s.courage + 1),
+    freezeTokens:
+      s.weekIndex % 2 === 0
+        ? Math.min(FREEZE_MAX, s.freezeTokens + 1)
+        : s.freezeTokens,
+  }
+}
+
+/** Runs advanceWeek as many times as real calendar weeks have passed. */
+function catchUpToNow(s: PlayerState): PlayerState {
+  const target = currentWeekIndex()
+  let next = s
+  while (next.weekIndex < target) next = advanceWeek(next)
+  return next
+}
+
+function loadPlayer(): PlayerState {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return freshPlayer()
+    return catchUpToNow(JSON.parse(raw) as PlayerState)
+  } catch {
+    return freshPlayer()
+  }
+}
+
 export function PlayerProvider({ children }: { children: ReactNode }) {
-  const [player, setPlayer] = useState<PlayerState>(mockInitialPlayer)
+  const [player, setPlayer] = useState<PlayerState>(loadPlayer)
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(player))
+    } catch {
+      // Private-browsing / storage-full: the session still works, it just
+      // won't survive a reload. Not worth surfacing to her over this.
+    }
+  }, [player])
 
   const markDone = useCallback((difficulty: Difficulty) => {
     setPlayer((s) => {
@@ -100,47 +173,14 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     return ok
   }, [])
 
-  /*
-    Archives the current week and opens the next one. A week left untouched
-    resolves to 'missed' here, same as if a real clock had ticked past it —
-    this is what lets the streak-break and history logic be exercised without
-    waiting for an actual week to pass.
-
-    Freeze regenerates every two week-transitions, matching Maya's "every two
-    weeks, not every week" spec — approximated here with weekIndex parity
-    since there's no wall-clock backend yet.
-  */
-  const rollToNextWeek = useCallback(() => {
-    setPlayer((s) => {
-      const resolvedStatus = s.weekStatus === 'open' ? 'missed' : s.weekStatus
-      const streakBroken = resolvedStatus === 'missed'
-      return {
-        ...s,
-        history: [
-          ...s.history,
-          {
-            weekIndex: s.weekIndex,
-            status: resolvedStatus,
-            difficulty: s.weekDifficulty,
-            xp: s.weekDifficulty ? TIERS[s.weekDifficulty].xp : 0,
-            reaction: s.weekReaction,
-          },
-        ],
-        weekIndex: s.weekIndex + 1,
-        weekStatus: 'open',
-        weekDifficulty: null,
-        weekReaction: null,
-        streakCurrent: streakBroken ? 0 : s.streakCurrent,
-        courage: Math.min(COURAGE_MAX, s.courage + 1),
-        freezeTokens:
-          s.weekIndex % 2 === 0
-            ? Math.min(FREEZE_MAX, s.freezeTokens + 1)
-            : s.freezeTokens,
-      }
-    })
+  const resetAll = useCallback(() => {
+    try {
+      localStorage.removeItem(STORAGE_KEY)
+    } catch {
+      // ignore
+    }
+    setPlayer(freshPlayer())
   }, [])
-
-  const resetAll = useCallback(() => setPlayer(mockInitialPlayer), [])
 
   const value = useMemo(
     () => ({
@@ -152,7 +192,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       setReaction,
       addReflection,
       spendCoins,
-      rollToNextWeek,
       resetAll,
     }),
     [
@@ -164,7 +203,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       setReaction,
       addReflection,
       spendCoins,
-      rollToNextWeek,
       resetAll,
     ],
   )

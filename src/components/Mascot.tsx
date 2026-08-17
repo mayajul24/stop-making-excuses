@@ -3,16 +3,15 @@ import type { Mood } from '../lib/voice'
 import './Mascot.css'
 
 /*
-  The recurring character — Maya herself: long dark wavy hair, warm skin,
-  thick brows, and the big open-eyed grin from her own photos. Sunglasses
-  pushed up on her head are the one constant accessory, an anchor for the
-  silhouette the way a mascot's collar or scarf would be.
+  The recurring character — Maya herself: long dark curly hair, warm skin,
+  thick brows, and the big open-eyed grin from her own photos.
 
-  Flat layered shapes throughout: hair is clipped into the head circle
-  rather than traced around it, eyes are a circle + highlight dot with
-  mood-specific overlays. Eyes stay open even when proud — the reference
-  photos are bright-eyed and grinning, not squint-happy, so the mouth
-  carries the excitement instead.
+  Flat layered shapes throughout: hair is a cluster of overlapping circles
+  rather than smooth wavy paths, which is what actually reads as curls at
+  this size — a single bezier blob just reads as wavy. The front fringe is
+  clipped to the head circle so it can't spill onto the face; the back
+  volume is left unclipped and allowed to bulge past the head's edge, which
+  is what gives it the fuller, rounder silhouette.
 */
 
 const HAIR = '#2e2019'
@@ -22,7 +21,54 @@ const SKIN_SHADE = '#d9a679'
 const INK = '#2b2019'
 const TEETH = '#fff8f0'
 const TOP = '#8fa8ae'
-const LENS = '#1c2733'
+
+/** A cluster of overlapping circles — the unit curly hair is built from. */
+function Curls({
+  spots,
+  fill,
+}: {
+  spots: [number, number, number][]
+  fill: string
+}) {
+  return (
+    <>
+      {spots.map(([cx, cy, r], i) => (
+        <circle key={i} cx={cx} cy={cy} r={r} fill={fill} />
+      ))}
+    </>
+  )
+}
+
+const BACK_VOLUME: [number, number, number][] = [
+  [60, 19, 29],
+  [29, 27, 21],
+  [91, 27, 21],
+  [16, 48, 19],
+  [104, 48, 19],
+  [14, 76, 17],
+  [106, 76, 17],
+  [19, 104, 15],
+  [101, 104, 15],
+  [27, 128, 13],
+  [93, 128, 13],
+]
+
+const BACK_HIGHLIGHTS: [number, number, number][] = [
+  [24, 40, 8],
+  [98, 42, 7],
+  [20, 90, 7],
+  [102, 92, 6.5],
+]
+
+const FRONT_FRINGE: [number, number, number][] = [
+  [34, 27, 11],
+  [48, 21, 11.5],
+  [60, 19, 12],
+  [72, 21, 11.5],
+  [86, 27, 11],
+  [26, 38, 10],
+  [94, 38, 10],
+]
 
 function Eyebrows({ mood }: { mood: Mood }) {
   if (mood === 'unimpressed') {
@@ -51,8 +97,8 @@ function Eyebrows({ mood }: { mood: Mood }) {
   }
   return (
     <>
-      <path d="M40 40 Q47.5 35.5 55 38.5" stroke={HAIR} strokeWidth="3.4" fill="none" strokeLinecap="round" />
-      <path d="M65 38.5 Q72.5 35.5 80 40" stroke={HAIR} strokeWidth="3.4" fill="none" strokeLinecap="round" />
+      <path d="M40 39.5 Q47.5 34.5 55 38" stroke={HAIR} strokeWidth="3.4" fill="none" strokeLinecap="round" />
+      <path d="M65 38 Q72.5 34.5 80 39.5" stroke={HAIR} strokeWidth="3.4" fill="none" strokeLinecap="round" />
     </>
   )
 }
@@ -92,8 +138,9 @@ function Mouth({ mood }: { mood: Mood }) {
   if (mood === 'unimpressed') {
     return <path d="M47 65 Q60 62 73 65" stroke={INK} strokeWidth="3" fill="none" strokeLinecap="round" />
   }
+  // Idle default — a full, warm smile. She's happy to see you even at rest.
   return (
-    <path d="M46 62 Q60 71 74 62" stroke={INK} strokeWidth="3" fill="none" strokeLinecap="round" />
+    <path d="M44 61 Q60 76 76 61" stroke={INK} strokeWidth="3.2" fill="none" strokeLinecap="round" />
   )
 }
 
@@ -116,17 +163,10 @@ export function Mascot({ mood = 'idle', size = 76 }: { mood?: Mood; size?: numbe
         </clipPath>
       </defs>
 
-      {/* hair volume, behind everything — curly and past the shoulders */}
+      {/* hair volume, behind everything — a curl cluster, not a smooth blob */}
       <g className="mascot__hairback">
-        <path
-          d="M20 66 Q12 100 22 138 L34 138 Q26 104 33 72 Z"
-          fill={HAIR}
-        />
-        <path
-          d="M100 66 Q108 100 98 138 L86 138 Q94 104 87 72 Z"
-          fill={HAIR}
-        />
-        <ellipse cx="60" cy="34" rx="36" ry="30" fill={HAIR} />
+        <Curls spots={BACK_VOLUME} fill={HAIR} />
+        <Curls spots={BACK_HIGHLIGHTS} fill={HAIR_MID} />
       </g>
 
       {/* shoulders + top */}
@@ -138,13 +178,9 @@ export function Mascot({ mood = 'idle', size = 76 }: { mood?: Mood; size?: numbe
       {/* head */}
       <circle cx="60" cy="50" r="33" fill={SKIN} />
 
-      {/* front hair, clipped to the head so it can't drift past the edge */}
+      {/* front curls, clipped to the head so they can't spill onto the face */}
       <g clipPath={`url(#${headClip})`}>
-        <path
-          d="M22 44 Q26 8 60 8 Q94 8 98 44 Q94 26 84 24 Q88 40 82 52 Q78 30 66 24 Q70 38 62 40 Q58 26 46 26 Q50 38 40 44 Q36 28 26 30 Q30 40 22 44 Z"
-          fill={HAIR}
-        />
-        <path d="M22 44 Q26 8 60 8 Q94 8 98 44 Q80 22 60 22 Q40 22 22 44 Z" fill={HAIR_MID} opacity="0.5" />
+        <Curls spots={FRONT_FRINGE} fill={HAIR} />
       </g>
 
       {/* ears + small gold hoops */}
@@ -157,14 +193,6 @@ export function Mascot({ mood = 'idle', size = 76 }: { mood?: Mood; size?: numbe
       <Eyes mood={mood} />
       <path d="M59 50 L57.5 58 Q60 59.5 62.5 58" stroke={SKIN_SHADE} strokeWidth="2" fill="none" strokeLinecap="round" />
       <Mouth mood={mood} />
-
-      {/* signature sunglasses, pushed up on top of the hair */}
-      <g className="mascot__shades">
-        <rect x="30" y="14" width="24" height="16" rx="8" fill={LENS} />
-        <rect x="66" y="14" width="24" height="16" rx="8" fill={LENS} />
-        <rect x="54" y="19" width="12" height="4" rx="2" fill={LENS} />
-        <path d="M35 19 Q40 17 46 19" stroke="rgba(255,255,255,0.35)" strokeWidth="2" fill="none" strokeLinecap="round" />
-      </g>
     </svg>
   )
 }
