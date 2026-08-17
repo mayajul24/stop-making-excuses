@@ -1,5 +1,7 @@
 import { useMemo } from 'react'
 import { completedCount, levelInfo } from '../lib/game'
+import { daysIntoWeek } from '../lib/calendar'
+import { nextPushNotification } from '../lib/notifications'
 import { usePlayer } from '../state/playerStore'
 import './Progress.css'
 
@@ -29,6 +31,13 @@ export function ProgressScreen() {
   const oldest = player.reflections[player.reflections.length - 1]
   const newest = player.reflections[0]
   const showGrowth = player.reflections.length >= 2
+
+  // Preview only — proves the trigger logic picks the right message without
+  // an actual delivery pipeline behind it yet.
+  const preview = useMemo(
+    () => nextPushNotification(player, daysIntoWeek(), player.weekIndex),
+    [player],
+  )
 
   return (
     <div className="page progressScreen">
@@ -83,6 +92,24 @@ export function ProgressScreen() {
           </div>
         </div>
       )}
+
+      <div className="pushpreview">
+        <span className="label">🔔 If push were live right now</span>
+        {preview ? (
+          <div className="pushpreview__card">
+            <span className="pushpreview__title">{preview.title}</span>
+            <span className="pushpreview__body">{preview.body}</span>
+          </div>
+        ) : (
+          <p className="pushpreview__quiet">
+            Nothing right now — she's good.
+          </p>
+        )}
+        <p className="pushpreview__note">
+          Preview only. Actually sending this to her phone needs a backend
+          that doesn't exist yet.
+        </p>
+      </div>
 
       <button
         className="resetlink"

@@ -15,3 +15,9 @@ export function daysLeftInWeek(now: number = Date.now()): number {
   const intoWeek = (now - EPOCH) % MS_WEEK
   return Math.max(1, Math.ceil((MS_WEEK - intoWeek) / MS_DAY))
 }
+
+/** How many days old the current calendar week is — 0 on the day it opened. */
+export function daysIntoWeek(now: number = Date.now()): number {
+  const intoWeek = (now - EPOCH) % MS_WEEK
+  return Math.floor(intoWeek / MS_DAY)
+}
