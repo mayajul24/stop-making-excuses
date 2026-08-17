@@ -34,7 +34,8 @@ export function Home() {
     player,
     markDone,
     freezeWeek,
-    useCowardMode,
+    chooseEasier,
+    markScary,
     refillCourage,
     setReaction,
     addReflection,
@@ -44,11 +45,11 @@ export function Home() {
   const voice = useMemo(() => homeVoice(player, daysLeft), [player, daysLeft])
   const nodes = useMemo(() => buildPath(player), [player])
 
-  // A session-only override so ⇄ and Coward Mode can change which tier is
+  // A session-only override so ⇄ and "I'm scared" can change which tier is
   // offered without touching committed state — nothing is written to the
   // player until she actually taps DONE.
   const [override, setOverride] = useState<Difficulty | null>(null)
-  const [cowardBanner, setCowardBanner] = useState(false)
+  const [easierBanner, setEasierBanner] = useState(false)
   const [reflectionText, setReflectionText] = useState('')
 
   // Defaults to the gentlest thing she can afford, not the hardest — ⇄ is
@@ -63,20 +64,26 @@ export function Home() {
     const current = selected ?? affordable[0]
     const i = affordable.indexOf(current)
     setOverride(affordable[(i + 1) % affordable.length])
-    setCowardBanner(false)
+    setEasierBanner(false)
   }
 
-  function handleCoward() {
-    useCowardMode()
-    setOverride('medium')
-    setCowardBanner(true)
+  // The "I'm scared" branch — steps down exactly one rung from whatever's
+  // currently offered rather than always jumping to a fixed tier, so it
+  // stays "a little smaller" instead of overcorrecting to the floor.
+  function handleScared() {
+    chooseEasier()
+    const affordable = TIER_ORDER.filter((d) => canAfford(player, d))
+    const current = selected ?? affordable[0]
+    const i = affordable.indexOf(current)
+    setOverride(affordable[Math.max(0, i - 1)])
+    setEasierBanner(true)
   }
 
   function handleMarkDone() {
     if (!selected) return
     markDone(selected)
     setOverride(null)
-    setCowardBanner(false)
+    setEasierBanner(false)
   }
 
   function handleSaveReflection() {
@@ -94,12 +101,27 @@ export function Home() {
       return (
         <div className="donepanel rise">
           <div className="donepanel__head">
-            <span className="donepanel__title">Week complete ✓</span>
+            <span className="donepanel__title">
+              {player.weekMarkedScary
+                ? '😬 Scared, and did it anyway.'
+                : 'That counts.'}
+            </span>
             <span className="donepanel__sub">
               {completedTier ? `${completedTier.done} · ` : ''}Maya's been
               notified 👀
             </span>
           </div>
+
+          {!player.weekMarkedScary ? (
+            <button className="scarytoggle" onClick={markScary}>
+              😰 Honestly? That felt scary — claim +{10} bonus Courage
+            </button>
+          ) : (
+            <div className="scarytoggle scarytoggle--done">
+              😬 Bonus Courage claimed. You didn’t need to conquer dating
+              today — one tiny win is the whole point.
+            </div>
+          )}
 
           <div className="reactionrow">
             {REACTIONS.map((r) => (
@@ -156,15 +178,17 @@ export function Home() {
 
     return (
       <>
-        {cowardBanner && (
-          <div className="cowardnote rise">Fine 🙄 Let's start easier.</div>
+        {easierBanner && (
+          <div className="easiernote rise">
+            Okay. No pressure. Let's make it smaller.
+          </div>
         )}
         <div className="secondary-row">
           <button className="secondary-btn" onClick={refillCourage}>
             👀 Free look +1
           </button>
-          <button className="secondary-btn" onClick={handleCoward}>
-            😩 Too much
+          <button className="secondary-btn" onClick={handleScared}>
+            😨 I'm scared
           </button>
           <button
             className="secondary-btn"
@@ -176,7 +200,7 @@ export function Home() {
         </div>
         <div className="misscard">
           <span className="misscard__eyebrow">
-            {tier.rank} · +{tier.xp} XP
+            {tier.rank} · +{tier.xp} Courage
           </span>
           <span className="misscard__title">{tier.headline}</span>
           <div className="misscard__row">

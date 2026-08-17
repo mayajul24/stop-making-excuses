@@ -288,7 +288,7 @@
   opacity: 0.4;
 }
 
-.cowardnote {
+.easiernote {
   background: var(--card);
   border: 1.5px dashed var(--card-edge);
   border-radius: var(--r-sm);
@@ -298,6 +298,25 @@
   color: var(--text-soft);
   margin-bottom: 8px;
   text-align: center;
+}
+
+.scarytoggle {
+  text-align: left;
+  background: var(--card-sunk);
+  border: 1.5px dashed var(--card-edge);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-soft);
+  line-height: 1.4;
+}
+
+.scarytoggle--done {
+  border-style: solid;
+  border-color: var(--gold-deep);
+  background: rgba(255, 200, 0, 0.1);
+  color: var(--gold);
 }
 
 /* ---------------------------------------------------------------

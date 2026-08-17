@@ -1,8 +1,10 @@
 import type { PlayerState } from '../types'
 
 /*
-  The voice: her blunt best friend. Warm, funny, never motivational-poster.
-  Celebrates showing up, never romantic outcomes.
+  The voice: her blunt best friend, not her coach. Warm, funny, a little
+  teasing — never guilt-tripping, never a motivational poster. The goal is
+  "okay, maybe I actually can do this," never "ugh, I failed." A missed week
+  gets a nudge, not a scolding — nothing here should read as disappointed.
 */
 
 export type Mood = 'idle' | 'smug' | 'unimpressed' | 'proud'
@@ -24,10 +26,10 @@ const IDLE_LINES = [
   'This is your moment.',
 ]
 
-const NAGGING_LINES = [
-  'Don’t break the streak 😈',
-  'Where did you go? 👀',
-  'Not from the couch, queen 😂',
+const NUDGE_LINES = [
+  'Still here when you’re ready 👀',
+  'No rush. I’ll wait.',
+  'Whenever you feel like it, not before.',
 ]
 
 const PROUD_LINES = ['Proud of you 🥹', 'Look at you!', 'See? Not so bad.']
@@ -62,12 +64,12 @@ export function homeVoice(state: PlayerState, daysLeft: number): HomeVoice {
 
   if (state.streakCurrent >= 1 && daysLeft <= 2) {
     return {
-      bannerTitle: '🚨 Your dating streak is about to die.',
+      bannerTitle: 'Your streak misses you 👀',
       bannerSub: `🔥 ${state.streakCurrent} weeks in a row · ${
         daysLeft === 1 ? '1 day' : `${daysLeft} days`
-      } left.`,
+      } left, if you feel like it.`,
       bannerTone: 'urgent',
-      mascotLine: pick(NAGGING_LINES, seed),
+      mascotLine: pick(NUDGE_LINES, seed),
       mascotMood: 'unimpressed',
     }
   }
@@ -75,11 +77,11 @@ export function homeVoice(state: PlayerState, daysLeft: number): HomeVoice {
   const trailing = state.history.slice(-3)
   if (trailing.length === 3 && trailing.every((w) => w.status === 'missed')) {
     return {
-      bannerTitle: 'You spent 3 weeks saying “maybe next week”.',
-      bannerSub: 'This is your villain origin story.',
-      bannerTone: 'urgent',
-      mascotLine: 'Let’s break the curse ✨',
-      mascotMood: 'unimpressed',
+      bannerTitle: 'Been a minute since you showed up.',
+      bannerSub: 'No pressure — one small thing, whenever you’re ready.',
+      bannerTone: 'calm',
+      mascotLine: 'Still here 👀',
+      mascotMood: 'idle',
     }
   }
 
@@ -90,7 +92,7 @@ export function homeVoice(state: PlayerState, daysLeft: number): HomeVoice {
         : 'Okay queen, we’re not finding a husband from the couch 😂',
     bannerSub:
       state.streakCurrent > 0
-        ? 'New week, one mission. Let’s keep going.'
+        ? 'New week, one small thing. Whatever size feels okay.'
         : 'Week one. Nothing to lose.',
     bannerTone: 'calm',
     mascotLine: pick(IDLE_LINES, seed),

@@ -3,6 +3,13 @@ import { completedCount, levelInfo } from '../lib/game'
 import { usePlayer } from '../state/playerStore'
 import './Progress.css'
 
+function fmtDate(ts: number) {
+  return new Date(ts).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  })
+}
+
 /*
   Level + stat grid, matching the official profile screen's 2x2 card layout.
   Levels count challenges completed, not raw XP — so this can't be gamed by
@@ -17,13 +24,19 @@ export function ProgressScreen() {
   const span = 5
   const progressed = done % span
 
+  // Oldest vs newest reflection — proof of growth, not a diary. Needs at
+  // least two entries or there's nothing to compare against.
+  const oldest = player.reflections[player.reflections.length - 1]
+  const newest = player.reflections[0]
+  const showGrowth = player.reflections.length >= 2
+
   return (
     <div className="page progressScreen">
       <div className="levelcard">
         <span className="levelcard__badge">{info.badge}</span>
         <h1 className="levelcard__title">{info.title}</h1>
         <span className="levelcard__sub">
-          {done} challenge{done === 1 ? '' : 's'} completed · {player.xp} XP
+          {done} brave action{done === 1 ? '' : 's'} · {player.xp} Courage XP
         </span>
         <div className="levelcard__track">
           <div
@@ -38,12 +51,12 @@ export function ProgressScreen() {
         <div className="statcard">
           <span className="statcard__icon">🔥</span>
           <span className="statcard__num">{player.streakCurrent}</span>
-          <span className="statcard__lbl">Current streak</span>
+          <span className="statcard__lbl">Weeks showing up</span>
         </div>
         <div className="statcard">
           <span className="statcard__icon">🏅</span>
           <span className="statcard__num">{player.streakLongest}</span>
-          <span className="statcard__lbl">Longest streak</span>
+          <span className="statcard__lbl">Best streak</span>
         </div>
         <div className="statcard">
           <span className="statcard__icon">📅</span>
@@ -56,6 +69,20 @@ export function ProgressScreen() {
           <span className="statcard__lbl">Freezes ready</span>
         </div>
       </div>
+
+      {showGrowth && (
+        <div className="growthcard">
+          <span className="label">You vs. you</span>
+          <div className="growthcard__row">
+            <span className="growthcard__tag">{fmtDate(oldest.ts)}</span>
+            <p className="growthcard__text">“{oldest.text}”</p>
+          </div>
+          <div className="growthcard__row growthcard__row--now">
+            <span className="growthcard__tag">{fmtDate(newest.ts)}</span>
+            <p className="growthcard__text">“{newest.text}”</p>
+          </div>
+        </div>
+      )}
 
       <button
         className="resetlink"

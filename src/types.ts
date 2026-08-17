@@ -45,7 +45,9 @@ export interface PlayerState {
   weekStatus: WeekStatus
   weekDifficulty: Difficulty | null
   weekReaction: Reaction | null
-  cowardUsed: boolean
+  /** She flagged this week's action as scary for her, specifically — grants a Courage XP bonus once. */
+  weekMarkedScary: boolean
+  wentEasier: boolean
   history: WeekRecord[]
   reflections: { ts: number; text: string }[]
 }

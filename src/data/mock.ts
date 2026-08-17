@@ -19,7 +19,8 @@ export const mockInitialPlayer: PlayerState = {
   weekStatus: 'open',
   weekDifficulty: null,
   weekReaction: null,
-  cowardUsed: false,
+  weekMarkedScary: false,
+  wentEasier: false,
   history: [],
   reflections: [],
 }

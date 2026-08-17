@@ -1,8 +1,9 @@
 import type { Difficulty, PlayerState, Reaction, WeekRecord } from '../types'
 
 /*
-  Game rules. Every number in this file was signed off by Maya and should not
-  drift: courage max 3, tier costs 1/1/2/3, XP 5/15/30/50, freeze caps at 4.
+  Game rules. Courage max 3, tier costs 1/1/2/3, freeze caps at 4 — those
+  stay fixed. XP (now "Courage XP", rewarding how much a step pushed her,
+  not the romantic outcome) runs 5/25/50/75 per the difficulty-ladder spec.
 */
 
 export const COURAGE_MAX = 3
@@ -29,11 +30,11 @@ export interface Tier {
 export const TIERS: Record<Difficulty, Tier> = {
   easy: {
     id: 'easy',
-    rank: 'EASY',
+    rank: '🐣 BARELY BRAVE',
     headline: 'OPEN THE APP',
     action: 'OPEN THE APP',
     done: 'OPENED THE APP',
-    why: 'You don’t have to write anything. Open it, scroll, like one person. Week closed.',
+    why: 'You don’t have to write anything. Open it, scroll, like one person you actually think is cute. Week closed.',
     steps: [
       'Open the dating app',
       'Scroll for thirty seconds',
@@ -45,45 +46,45 @@ export const TIERS: Record<Difficulty, Tier> = {
   },
   medium: {
     id: 'medium',
-    rank: 'MEDIUM',
+    rank: '😬 A LITTLE SCARY',
     headline: 'SEND A MESSAGE',
     action: 'SEND A MESSAGE',
     done: 'SENT A MESSAGE',
-    why: 'You don’t need to find a husband. You need to talk to one human being.',
+    why: 'You don’t need to find a husband. You need to reply to one human being.',
     steps: [
       'Pick one match',
       'Write something real — not “hey”',
       'Send it before you edit it a fifth time',
     ],
-    xp: 15,
+    xp: 25,
     courage: 1,
     stars: 2,
   },
   hard: {
     id: 'hard',
-    rank: 'HARD',
-    headline: 'ASK SOMEONE OUT',
-    action: 'ASK SOMEONE OUT',
-    done: 'ASKED SOMEONE OUT',
-    why: 'Worst case is “no”. And the worst thing that happens after a no is nothing.',
+    rank: '😳 OKAY WE’RE DOING THIS',
+    headline: 'SUGGEST COFFEE',
+    action: 'SUGGEST COFFEE',
+    done: 'SUGGESTED COFFEE',
+    why: 'Not a Big Declaration. Just "want to grab a coffee sometime?" Worst case is "no", and the worst thing after a no is nothing.',
     steps: [
       'Check the conversation is actually flowing',
-      'Suggest something concrete: place, day, time',
+      'Keep it low-key: coffee, not dinner',
       'Send it',
     ],
-    xp: 30,
+    xp: 50,
     courage: 2,
     stars: 3,
   },
   nightmare: {
     id: 'nightmare',
-    rank: 'NIGHTMARE',
+    rank: '💀 MAIN CHARACTER',
     headline: 'GO ON A DATE',
     action: 'GO ON A DATE',
     done: 'WENT ON A DATE',
     why: 'Ninety minutes. Public place. You’re allowed to leave after.',
     steps: ['Pick a public place', 'Tell Maya when and where', 'Go'],
-    xp: 50,
+    xp: 75,
     courage: 3,
     stars: 3,
   },
@@ -150,12 +151,10 @@ export const ACHIEVEMENTS: Achievement[] = [
     earned: (h) => hasDifficulty(h, ['medium', 'hard', 'nightmare']),
   },
   {
-    id: 'asked_out',
-    title: 'ASKED PEOPLE OUT',
-    blurb: 'Not just once. You’ve got a system now.',
+    id: 'three_times_brave',
+    title: 'THREE TIMES BRAVE',
+    blurb: 'Hard is only hard the first few times.',
     emoji: '🫣',
-    // A single ask used to be enough — bumped to 3 so this reads as a real
-    // pattern, not a one-off spike of courage.
     earned: (h) => countDifficulty(h, ['hard', 'nightmare']) >= 3,
   },
   {
@@ -194,11 +193,11 @@ export const ACHIEVEMENTS: Achievement[] = [
     earned: (_h, s) => s.streakLongest >= 4,
   },
   {
-    id: 'coward',
-    title: 'COWARD MODE GRADUATE',
-    blurb: 'You dropped a level instead of disappearing. That counts.',
-    emoji: '🐣',
-    earned: (_h, s) => s.cowardUsed,
+    id: 'played_smart',
+    title: 'PLAYED IT SMART',
+    blurb: 'You picked the easier path instead of disappearing. That’s not quitting — that’s strategy.',
+    emoji: '🧠',
+    earned: (_h, s) => s.wentEasier,
   },
   {
     id: 'streak8',
