@@ -40,7 +40,7 @@ export interface Tier {
 export const TIERS: Record<Difficulty, Tier> = {
   easy: {
     id: 'easy',
-    rank: '🐣 BARELY BRAVE',
+    rank: '🌱 BARELY BRAVE',
     headline: 'OPEN THE APP',
     action: 'OPEN THE APP',
     done: 'OPENED THE APP',
@@ -103,7 +103,7 @@ export const TIER_ORDER: Difficulty[] = ['easy', 'medium', 'hard', 'nightmare']
    -------------------------------------------------------------------- */
 
 const LEVEL_TITLES: Record<number, string> = {
-  1: 'Baby Steps 🐣',
+  1: 'Baby Steps 🌱',
   2: 'Getting Warmer 🌤️',
   3: 'Flirting Rookie 💅',
   4: 'Message Slinger 💬',
@@ -122,7 +122,7 @@ export function levelInfo(completedCount: number) {
     return {
       level,
       title: LEVEL_TITLES[level],
-      badge: level < 3 ? '🐣' : level < 6 ? '🌱' : level < 9 ? '🌸' : '✨',
+      badge: level < 3 ? '🌱' : level < 6 ? '🌿' : level < 9 ? '🌸' : '✨',
     }
   return { level, title: `Certified Legend 🏆 ×${level - 9}`, badge: '🏆' }
 }
