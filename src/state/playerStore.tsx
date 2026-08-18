@@ -22,13 +22,10 @@ const STORAGE_KEY = 'stami:player'
   swapping in a real backend later means rewriting this file's insides, not
   every screen that touches the player.
 */
-const ANXIOUS_BONUS_XP = 10
-
 interface PlayerActions {
   markDone: (difficulty: Difficulty) => void
   freezeWeek: () => void
   chooseEasier: () => void
-  markAnxious: () => void
   refillCourage: () => void
   setReaction: (r: Reaction) => void
   addReflection: (text: string) => void
@@ -74,7 +71,6 @@ function advanceWeek(s: PlayerState): PlayerState {
     weekStatus: 'open',
     weekDifficulty: null,
     weekReaction: null,
-    weekMarkedAnxious: false,
     streakCurrent: streakBroken ? 0 : s.streakCurrent,
     courage: Math.min(COURAGE_MAX, s.courage + 1),
     freezeTokens:
@@ -140,7 +136,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         weekStatus: 'done',
         weekDifficulty: difficulty,
         weekReaction: null,
-        weekMarkedAnxious: false,
         streakCurrent,
         streakLongest: Math.max(s.streakLongest, streakCurrent),
         weeksActive: s.weeksActive + 1,
@@ -159,22 +154,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   // something smaller so there's always an easier door out.
   const chooseEasier = useCallback(() => {
     setPlayer((s) => (s.weekStatus === 'open' ? { ...s, wentEasier: true } : s))
-  }, [])
-
-  // "This was anxiety-inducing for ME" — a flat Courage XP bonus on top of
-  // the tier's own reward, independent of which tier she picked. A small
-  // Easy win she had to psych herself up for counts as much as a big one.
-  // Idempotent so repeat taps can't farm it.
-  const markAnxious = useCallback(() => {
-    setPlayer((s) => {
-      if (s.weekStatus !== 'done' || s.weekMarkedAnxious) return s
-      return {
-        ...s,
-        xp: s.xp + ANXIOUS_BONUS_XP,
-        coins: s.coins + ANXIOUS_BONUS_XP,
-        weekMarkedAnxious: true,
-      }
-    })
   }, [])
 
   const refillCourage = useCallback(() => {
@@ -222,7 +201,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       markDone,
       freezeWeek,
       chooseEasier,
-      markAnxious,
       refillCourage,
       setReaction,
       addReflection,
@@ -234,7 +212,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       markDone,
       freezeWeek,
       chooseEasier,
-      markAnxious,
       refillCourage,
       setReaction,
       addReflection,

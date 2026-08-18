@@ -35,7 +35,6 @@ export function Home() {
     markDone,
     freezeWeek,
     chooseEasier,
-    markAnxious,
     refillCourage,
     setReaction,
     addReflection,
@@ -95,18 +94,6 @@ export function Home() {
     if (player.weekStatus === 'done') {
       return (
         <div className="donepanel rise">
-          {!player.weekMarkedAnxious ? (
-            <button className="anxioustoggle" onClick={markAnxious}>
-              😰 Honestly? I felt anxious about this — claim +{10} bonus
-              Courage
-            </button>
-          ) : (
-            <div className="anxioustoggle anxioustoggle--done">
-              😬 Bonus Courage claimed. You didn’t need to conquer dating
-              today — one tiny win is the whole point.
-            </div>
-          )}
-
           <div className="reactionrow">
             {REACTIONS.map((r) => (
               <button
