@@ -95,7 +95,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const supabase = createClient(supabaseUrl, supabaseKey)
 
   const [{ data: stateRow }, { data: subRow }, { data: logRow }] = await Promise.all([
-    supabase.from('player_state').select('data').eq('id', 1).maybeSingle(),
+    supabase.from('player_state').select('data, updated_at').eq('id', 1).maybeSingle(),
     supabase.from('push_subscription').select('*').eq('id', 1).maybeSingle(),
     supabase.from('push_log').select('*').eq('id', 1).maybeSingle(),
   ])
@@ -113,7 +113,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const notification = eveningReminder(player, player.dayIndex)
 
   if (!notification) {
-    res.status(200).json({ sent: false, reason: 'nothing to say right now' })
+    // TEMPORARY diagnostic — echoes back what's actually stored server-side
+    // so a mismatch against what the phone shows is visible without needing
+    // browser devtools. Remove once the sync gap is confirmed fixed.
+    res.status(200).json({
+      sent: false,
+      reason: 'nothing to say right now',
+      debugDayStatus: player.dayStatus,
+      debugDayIndex: player.dayIndex,
+      debugStreak: player.streakCurrent,
+      debugStateUpdatedAt: stateRow.updated_at ?? null,
+    })
     return
   }
 
