@@ -1,7 +1,5 @@
 import { useMemo } from 'react'
 import { completedCount, levelInfo } from '../lib/game'
-import { daysIntoWeek } from '../lib/calendar'
-import { nextPushNotification } from '../lib/notifications'
 import { usePlayer } from '../state/playerStore'
 import { PushToggle } from '../components/PushToggle'
 import './Progress.css'
@@ -32,13 +30,6 @@ export function ProgressScreen() {
   const oldest = player.reflections[player.reflections.length - 1]
   const newest = player.reflections[0]
   const showGrowth = player.reflections.length >= 2
-
-  // Preview only — proves the trigger logic picks the right message without
-  // an actual delivery pipeline behind it yet.
-  const preview = useMemo(
-    () => nextPushNotification(player, daysIntoWeek(), player.weekIndex),
-    [player],
-  )
 
   return (
     <div className="page progressScreen">
@@ -97,18 +88,6 @@ export function ProgressScreen() {
       <div className="pushpreview">
         <span className="label">🔔 Notifications</span>
         <PushToggle />
-        {preview ? (
-          <div className="pushpreview__card">
-            <span className="pushpreview__title">
-              What tonight's would say
-            </span>
-            <span className="pushpreview__body">{preview.body}</span>
-          </div>
-        ) : (
-          <p className="pushpreview__quiet">
-            Nothing to send right now — she's good.
-          </p>
-        )}
       </div>
 
       <button

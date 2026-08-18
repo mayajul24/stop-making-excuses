@@ -4,6 +4,7 @@ import { Wins } from './screens/Wins'
 import { Rewards } from './screens/Rewards'
 import { ProgressScreen } from './screens/Progress'
 import { TabBar, type TabId } from './components/TabBar'
+import { PushOnboarding } from './components/PushOnboarding'
 import { PlayerProvider } from './state/playerStore'
 
 const SCREENS: Record<TabId, React.ComponentType> = {
@@ -26,6 +27,7 @@ export default function App() {
           </div>
           <TabBar active={tab} onChange={setTab} />
         </div>
+        <PushOnboarding />
       </div>
     </PlayerProvider>
   )

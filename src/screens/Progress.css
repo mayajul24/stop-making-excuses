@@ -135,43 +135,6 @@
   gap: 8px;
 }
 
-.pushpreview__card {
-  background: var(--card-sunk);
-  border: 1.5px solid var(--card-edge);
-  border-radius: var(--r-md);
-  padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.pushpreview__title {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-faint);
-}
-
-.pushpreview__body {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--text);
-  line-height: 1.4;
-}
-
-.pushpreview__quiet {
-  margin: 0;
-  font-size: 13px;
-  color: var(--text-faint);
-  font-style: italic;
-}
-
-.pushpreview__note {
-  margin: 0;
-  font-size: 10.5px;
-  color: var(--text-faint);
-  line-height: 1.4;
-}
-
 .resetlink {
   margin: 8px auto 0;
   font-size: 11.5px;
