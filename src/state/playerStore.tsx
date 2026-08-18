@@ -8,8 +8,8 @@ import {
   type ReactNode,
 } from 'react'
 import type { Difficulty, PlayerState, Reaction } from '../types'
-import { COURAGE_MAX, FREEZE_MAX, TIERS } from '../lib/game'
-import { currentWeekIndex } from '../lib/calendar'
+import { FREEZE_MAX, TIERS } from '../lib/game'
+import { currentDayIndex } from '../lib/calendar'
 import { mockInitialPlayer } from '../data/mock'
 import { supabase } from '../lib/supabaseClient'
 
@@ -24,9 +24,8 @@ const STORAGE_KEY = 'stami:player'
 */
 interface PlayerActions {
   markDone: (difficulty: Difficulty) => void
-  freezeWeek: () => void
+  freezeToday: () => void
   chooseEasier: () => void
-  refillCourage: () => void
   setReaction: (r: Reaction) => void
   addReflection: (text: string) => void
   spendCoins: (amount: number) => boolean
@@ -37,54 +36,53 @@ const PlayerContext = createContext<
   { player: PlayerState } & PlayerActions
 >(null as never)
 
-/** A brand-new player, anchored to whatever the real current week is. */
+/** A brand-new player, anchored to whatever the real current day is. */
 function freshPlayer(): PlayerState {
-  return { ...mockInitialPlayer, weekIndex: currentWeekIndex() }
+  return { ...mockInitialPlayer, dayIndex: currentDayIndex() }
 }
 
 /**
- * Archives one week and opens the next — pure, so it can run in a loop to
- * catch up several real weeks at once (the app closed for a while) without
- * duplicating this logic in a UI action. A week left open resolves to
+ * Archives one day and opens the next — pure, so it can run in a loop to
+ * catch up several real days at once (the app closed for a while) without
+ * duplicating this logic in a UI action. A day left open resolves to
  * 'missed', which is what breaks the streak.
  *
- * Freeze regenerates every two week-transitions, matching the "every two
- * weeks, not every week" spec, approximated with weekIndex parity — good
- * enough without a scheduled job counting real elapsed weeks.
+ * Freeze regenerates every 14 day-transitions — the same real-world two
+ * weeks the old weekly version regenerated it every 2 week-transitions,
+ * just expressed in the new atomic unit.
  */
-function advanceWeek(s: PlayerState): PlayerState {
-  const resolvedStatus = s.weekStatus === 'open' ? 'missed' : s.weekStatus
+function advanceDay(s: PlayerState): PlayerState {
+  const resolvedStatus = s.dayStatus === 'open' ? 'missed' : s.dayStatus
   const streakBroken = resolvedStatus === 'missed'
   return {
     ...s,
     history: [
       ...s.history,
       {
-        weekIndex: s.weekIndex,
+        dayIndex: s.dayIndex,
         status: resolvedStatus,
-        difficulty: s.weekDifficulty,
-        xp: s.weekDifficulty ? TIERS[s.weekDifficulty].xp : 0,
-        reaction: s.weekReaction,
+        difficulty: s.dayDifficulty,
+        xp: s.dayDifficulty ? TIERS[s.dayDifficulty].xp : 0,
+        reaction: s.dayReaction,
       },
     ],
-    weekIndex: s.weekIndex + 1,
-    weekStatus: 'open',
-    weekDifficulty: null,
-    weekReaction: null,
+    dayIndex: s.dayIndex + 1,
+    dayStatus: 'open',
+    dayDifficulty: null,
+    dayReaction: null,
     streakCurrent: streakBroken ? 0 : s.streakCurrent,
-    courage: Math.min(COURAGE_MAX, s.courage + 1),
     freezeTokens:
-      s.weekIndex % 2 === 0
+      s.dayIndex % 14 === 0
         ? Math.min(FREEZE_MAX, s.freezeTokens + 1)
         : s.freezeTokens,
   }
 }
 
-/** Runs advanceWeek as many times as real calendar weeks have passed. */
+/** Runs advanceDay as many times as real calendar days have passed. */
 function catchUpToNow(s: PlayerState): PlayerState {
-  const target = currentWeekIndex()
+  const target = currentDayIndex()
   let next = s
-  while (next.weekIndex < target) next = advanceWeek(next)
+  while (next.dayIndex < target) next = advanceDay(next)
   return next
 }
 
@@ -124,44 +122,38 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
   const markDone = useCallback((difficulty: Difficulty) => {
     setPlayer((s) => {
-      if (s.weekStatus !== 'open') return s
+      if (s.dayStatus !== 'open') return s
       const tier = TIERS[difficulty]
-      if (s.courage < tier.courage) return s
       const streakCurrent = s.streakCurrent + 1
       return {
         ...s,
         xp: s.xp + tier.xp,
         coins: s.coins + tier.xp,
-        courage: s.courage - tier.courage,
-        weekStatus: 'done',
-        weekDifficulty: difficulty,
-        weekReaction: null,
+        dayStatus: 'done',
+        dayDifficulty: difficulty,
+        dayReaction: null,
         streakCurrent,
         streakLongest: Math.max(s.streakLongest, streakCurrent),
-        weeksActive: s.weeksActive + 1,
+        daysActive: s.daysActive + 1,
       }
     })
   }, [])
 
-  const freezeWeek = useCallback(() => {
+  const freezeToday = useCallback(() => {
     setPlayer((s) => {
-      if (s.weekStatus !== 'open' || s.freezeTokens <= 0) return s
-      return { ...s, weekStatus: 'frozen', freezeTokens: s.freezeTokens - 1 }
+      if (s.dayStatus !== 'open' || s.freezeTokens <= 0) return s
+      return { ...s, dayStatus: 'frozen', freezeTokens: s.freezeTokens - 1 }
     })
   }, [])
 
-  // Never fails, never marks the week done — it just quietly offers
+  // Never fails, never marks the day done — it just quietly offers
   // something smaller so there's always an easier door out.
   const chooseEasier = useCallback(() => {
-    setPlayer((s) => (s.weekStatus === 'open' ? { ...s, wentEasier: true } : s))
-  }, [])
-
-  const refillCourage = useCallback(() => {
-    setPlayer((s) => ({ ...s, courage: Math.min(COURAGE_MAX, s.courage + 1) }))
+    setPlayer((s) => (s.dayStatus === 'open' ? { ...s, wentEasier: true } : s))
   }, [])
 
   const setReaction = useCallback((r: Reaction) => {
-    setPlayer((s) => (s.weekStatus === 'done' ? { ...s, weekReaction: r } : s))
+    setPlayer((s) => (s.dayStatus === 'done' ? { ...s, dayReaction: r } : s))
   }, [])
 
   const addReflection = useCallback((text: string) => {
@@ -199,9 +191,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     () => ({
       player,
       markDone,
-      freezeWeek,
+      freezeToday,
       chooseEasier,
-      refillCourage,
       setReaction,
       addReflection,
       spendCoins,
@@ -210,9 +201,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     [
       player,
       markDone,
-      freezeWeek,
+      freezeToday,
       chooseEasier,
-      refillCourage,
       setReaction,
       addReflection,
       spendCoins,

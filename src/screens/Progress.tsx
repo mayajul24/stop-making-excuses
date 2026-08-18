@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { completedCount, levelInfo } from '../lib/game'
 import { usePlayer } from '../state/playerStore'
 import { PushToggle } from '../components/PushToggle'
+import { StreakFlame } from '../components/StreakFlame'
 import './Progress.css'
 
 function fmtDate(ts: number) {
@@ -50,9 +51,11 @@ export function ProgressScreen() {
 
       <div className="statgrid">
         <div className="statcard">
-          <span className="statcard__icon">🔥</span>
+          <span className="statcard__icon">
+            <StreakFlame lit={player.streakCurrent > 0} size={22} />
+          </span>
           <span className="statcard__num">{player.streakCurrent}</span>
-          <span className="statcard__lbl">Weeks showing up</span>
+          <span className="statcard__lbl">Days showing up</span>
         </div>
         <div className="statcard">
           <span className="statcard__icon">🏅</span>
@@ -61,8 +64,8 @@ export function ProgressScreen() {
         </div>
         <div className="statcard">
           <span className="statcard__icon">📅</span>
-          <span className="statcard__num">{player.weeksActive}</span>
-          <span className="statcard__lbl">Weeks active</span>
+          <span className="statcard__num">{player.daysActive}</span>
+          <span className="statcard__lbl">Days active</span>
         </div>
         <div className="statcard">
           <span className="statcard__icon">❄️</span>

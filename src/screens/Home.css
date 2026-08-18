@@ -48,9 +48,6 @@
 .vital--streak b {
   color: var(--orange);
 }
-.vital--courage b {
-  color: var(--rose);
-}
 .vital--xp b {
   color: var(--gold);
 }
@@ -218,15 +215,6 @@
   transform: scale(0.96);
 }
 
-.misscard__pill--rose {
-  color: var(--rose-deep);
-}
-
-.misscard--rose {
-  background: var(--rose);
-  box-shadow: 0 var(--lip) 0 var(--rose-deep);
-}
-
 /* START sits beside the difficulty swap rather than under it, so the one
    card carries both the commit action and the escape hatch. */
 .misscard__row {
@@ -258,7 +246,7 @@
   background: rgba(255, 255, 255, 0.26);
 }
 
-/* --- secondary actions: refill / coward / freeze ----------------- */
+/* --- secondary actions: step down / freeze ----------------- */
 
 .secondary-row {
   display: flex;
@@ -382,7 +370,7 @@
   border-radius: var(--r-sm);
 }
 
-.nextweeknote {
+.nextdaynote {
   margin: 0;
   text-align: center;
   font-size: 11.5px;

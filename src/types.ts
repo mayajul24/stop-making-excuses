@@ -1,6 +1,6 @@
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'nightmare'
 
-export type WeekStatus = 'open' | 'done' | 'frozen' | 'missed'
+export type DayStatus = 'open' | 'done' | 'frozen' | 'missed'
 
 export type Reaction =
   | 'great_date'
@@ -9,10 +9,10 @@ export type Reaction =
   | 'ghosted'
   | 'second_date'
 
-/** One resolved week in the journey. */
-export interface WeekRecord {
-  weekIndex: number
-  status: Exclude<WeekStatus, 'open'>
+/** One resolved day in the journey. */
+export interface DayRecord {
+  dayIndex: number
+  status: Exclude<DayStatus, 'open'>
   difficulty: Difficulty | null
   xp: number
   reaction: Reaction | null
@@ -38,14 +38,13 @@ export interface PlayerState {
   coins: number
   streakCurrent: number
   streakLongest: number
-  weeksActive: number
+  daysActive: number
   freezeTokens: number
-  courage: number
-  weekIndex: number
-  weekStatus: WeekStatus
-  weekDifficulty: Difficulty | null
-  weekReaction: Reaction | null
+  dayIndex: number
+  dayStatus: DayStatus
+  dayDifficulty: Difficulty | null
+  dayReaction: Reaction | null
   wentEasier: boolean
-  history: WeekRecord[]
+  history: DayRecord[]
   reflections: { ts: number; text: string }[]
 }

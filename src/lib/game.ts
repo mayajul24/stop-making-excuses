@@ -1,12 +1,23 @@
-import type { Difficulty, PlayerState, Reaction, WeekRecord } from '../types'
+import type { Difficulty, PlayerState, Reaction, DayRecord } from '../types'
 
 /*
-  Game rules. Courage max 3, tier costs 1/1/2/3, freeze caps at 4 — those
-  stay fixed. XP (now "Courage XP", rewarding how much a step pushed her,
-  not the romantic outcome) runs 5/25/50/75 per the difficulty-ladder spec.
+  Game rules. Freeze caps at 4. XP ("Courage XP", rewarding how much a step
+  pushed her, not the romantic outcome) runs 5/25/50/75 per the
+  difficulty-ladder spec.
+
+  There is no resource gating difficulty anymore — Courage (which used to
+  cost 1/1/2/3 and cap what she could pick) was removed when challenges
+  went from weekly to daily. A resource that fully refills once per period
+  stops meaning anything once the period is a day instead of a week: at
+  full Courage, Nightmare was always affordable on its own cost, so
+  refilling it daily would hand her "go on a date" as a default option
+  almost every day — exactly what the gate existed to prevent. Duolingo
+  doesn't gate lesson difficulty by a spendable resource either; she picks
+  whatever tier she wants, any day. What still stops Nightmare from being
+  the default is that the app always *suggests* Easy first (see Home.tsx) —
+  escalating is something she opts into via ⇄, never the thing she's handed.
 */
 
-export const COURAGE_MAX = 3
 export const FREEZE_MAX = 4
 
 export interface Tier {
@@ -23,7 +34,6 @@ export interface Tier {
   /** Step-by-step, shown once she's committed to the mission. */
   steps: string[]
   xp: number
-  courage: number
   stars: 1 | 2 | 3
 }
 
@@ -34,14 +44,13 @@ export const TIERS: Record<Difficulty, Tier> = {
     headline: 'OPEN THE APP',
     action: 'OPEN THE APP',
     done: 'OPENED THE APP',
-    why: 'You don’t have to write anything. Open it, scroll, like one person you actually think is cute. Week closed.',
+    why: 'You don’t have to write anything. Open it, scroll, like one person you actually think is cute. Today’s done.',
     steps: [
       'Open the dating app',
       'Scroll for thirty seconds',
       'Like one person — don’t overthink it',
     ],
     xp: 5,
-    courage: 1,
     stars: 1,
   },
   medium: {
@@ -57,7 +66,6 @@ export const TIERS: Record<Difficulty, Tier> = {
       'Send it before you edit it a fifth time',
     ],
     xp: 25,
-    courage: 1,
     stars: 2,
   },
   hard: {
@@ -73,7 +81,6 @@ export const TIERS: Record<Difficulty, Tier> = {
       'Send it',
     ],
     xp: 50,
-    courage: 2,
     stars: 3,
   },
   nightmare: {
@@ -85,7 +92,6 @@ export const TIERS: Record<Difficulty, Tier> = {
     why: 'Ninety minutes. Public place. You’re allowed to leave after.',
     steps: ['Pick a public place', 'Tell Maya when and where', 'Go'],
     xp: 75,
-    courage: 3,
     stars: 3,
   },
 }
@@ -122,7 +128,7 @@ export function levelInfo(completedCount: number) {
 }
 
 /* --------------------------------------------------------------------
-   Achievements — Maya's nine unlock conditions, set in the display voice.
+   Achievements — Maya's unlock conditions, set in the display voice.
    -------------------------------------------------------------------- */
 
 export interface Achievement {
@@ -130,17 +136,17 @@ export interface Achievement {
   title: string
   blurb: string
   emoji: string
-  earned: (h: WeekRecord[], s: PlayerState) => boolean
+  earned: (h: DayRecord[], s: PlayerState) => boolean
 }
 
-const hasDifficulty = (h: WeekRecord[], list: Difficulty[]) =>
-  h.some((w) => w.difficulty !== null && list.includes(w.difficulty))
+const hasDifficulty = (h: DayRecord[], list: Difficulty[]) =>
+  h.some((d) => d.difficulty !== null && list.includes(d.difficulty))
 
-const countDifficulty = (h: WeekRecord[], list: Difficulty[]) =>
-  h.filter((w) => w.difficulty !== null && list.includes(w.difficulty)).length
+const countDifficulty = (h: DayRecord[], list: Difficulty[]) =>
+  h.filter((d) => d.difficulty !== null && list.includes(d.difficulty)).length
 
-const hasReaction = (h: WeekRecord[], r: Reaction) =>
-  h.some((w) => w.reaction === r)
+const hasReaction = (h: DayRecord[], r: Reaction) =>
+  h.some((d) => d.reaction === r)
 
 export const ACHIEVEMENTS: Achievement[] = [
   {
@@ -186,11 +192,13 @@ export const ACHIEVEMENTS: Achievement[] = [
     earned: (h) => hasReaction(h, 'second_date'),
   },
   {
-    id: 'streak4',
-    title: '4-WEEK STREAK',
-    blurb: 'Four weeks of showing up.',
+    // Was "4-week streak" (28 days) before the move to daily challenges —
+    // same real-world duration, just counted in the new atomic unit.
+    id: 'streak28',
+    title: '28-DAY STREAK',
+    blurb: 'Four weeks of showing up, one day at a time.',
     emoji: '🔥',
-    earned: (_h, s) => s.streakLongest >= 4,
+    earned: (_h, s) => s.streakLongest >= 28,
   },
   {
     id: 'played_smart',
@@ -200,11 +208,12 @@ export const ACHIEVEMENTS: Achievement[] = [
     earned: (_h, s) => s.wentEasier,
   },
   {
-    id: 'streak8',
-    title: '8-WEEK STREAK',
+    // Was "8-week streak" (56 days) — same reasoning as streak28.
+    id: 'streak56',
+    title: '56-DAY STREAK',
     blurb: 'Eight weeks. That’s not an accident anymore.',
     emoji: '👑',
-    earned: (_h, s) => s.streakLongest >= 8,
+    earned: (_h, s) => s.streakLongest >= 56,
   },
 ]
 
@@ -212,40 +221,22 @@ export const ACHIEVEMENTS: Achievement[] = [
    Derived values
    -------------------------------------------------------------------- */
 
-/** History plus the week in progress, if it has resolved to done or frozen. */
-export function fullHistory(s: PlayerState): WeekRecord[] {
-  if (s.weekStatus !== 'done' && s.weekStatus !== 'frozen') return s.history
+/** History plus the day in progress, if it has resolved to done or frozen. */
+export function fullHistory(s: PlayerState): DayRecord[] {
+  if (s.dayStatus !== 'done' && s.dayStatus !== 'frozen') return s.history
   return [
     ...s.history,
     {
-      weekIndex: s.weekIndex,
-      status: s.weekStatus,
-      difficulty: s.weekDifficulty,
-      xp: s.weekDifficulty ? TIERS[s.weekDifficulty].xp : 0,
-      reaction: s.weekReaction,
+      dayIndex: s.dayIndex,
+      status: s.dayStatus,
+      difficulty: s.dayDifficulty,
+      xp: s.dayDifficulty ? TIERS[s.dayDifficulty].xp : 0,
+      reaction: s.dayReaction,
     },
   ]
 }
 
 export function completedCount(s: PlayerState): number {
-  const past = s.history.filter((w) => w.status === 'done').length
-  return past + (s.weekStatus === 'done' ? 1 : 0)
-}
-
-export function canAfford(s: PlayerState, d: Difficulty): boolean {
-  return s.courage >= TIERS[d].courage
-}
-
-/**
- * The gentlest tier she can still pay for this week — the default offer.
- * Escalating to something harder is something she opts into via ⇄, not the
- * thing she's handed by default. (At full courage, Nightmare is technically
- * affordable on its own cost — defaulting to "go on a date" as week one's
- * suggestion would undercut the whole point of the courage gate.)
- */
-export function easiestAffordable(s: PlayerState): Difficulty | null {
-  for (const d of TIER_ORDER) {
-    if (canAfford(s, d)) return d
-  }
-  return null
+  const past = s.history.filter((d) => d.status === 'done').length
+  return past + (s.dayStatus === 'done' ? 1 : 0)
 }

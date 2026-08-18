@@ -3,43 +3,36 @@ import { createClient } from '@supabase/supabase-js'
 import webpush from 'web-push'
 
 /*
-  Fully self-contained on purpose — no imports from ../src/lib. An earlier
-  version imported nextPushNotification() and daysIntoWeek() from there and
-  the deployed function crashed with FUNCTION_INVOCATION_FAILED before even
-  reaching its own error handling, which is consistent with Vercel's Node
+  Fully self-contained on purpose — no imports from ../src/lib. A version
+  of this function that imported from src/lib/notifications crashed in
+  production with FUNCTION_INVOCATION_FAILED, consistent with Vercel's Node
   bundler not following relative imports that cross the api/ folder
   boundary — api/classify.ts in the sibling shopping-list project avoids
-  the same thing for the same reason. The notification trigger logic below
-  must be kept in sync by hand with src/lib/notifications.ts; there's no
+  the same thing for the same reason. This logic must be kept in sync by
+  hand with src/lib/notifications.ts's eveningReminder(); there's no
   automatic way to share it given that constraint.
+
+  Reminders only, evening-only — no celebration push. Maya was explicit:
+  encourage her in-app, after she's already done something; a push
+  notification's only job is reaching her if today never happened.
 */
 
 type Difficulty = 'easy' | 'medium' | 'hard' | 'nightmare'
-type WeekStatus = 'open' | 'done' | 'frozen' | 'missed'
+type DayStatus = 'open' | 'done' | 'frozen' | 'missed'
 
-interface WeekRecord {
-  status: WeekStatus
+interface DayRecord {
+  status: DayStatus
   difficulty: Difficulty | null
 }
 
 interface PlayerState {
-  weekStatus: WeekStatus
-  weekIndex: number
+  dayStatus: DayStatus
+  dayIndex: number
   streakCurrent: number
-  courage: number
-  history: WeekRecord[]
+  history: DayRecord[]
 }
 
-const COURAGE_MAX = 3
-
-type NotificationTrigger =
-  | 'streak_dying'
-  | 'inactivity_mild'
-  | 'inactivity_severe'
-  | 'villain_arc'
-  | 'week_complete'
-  | 'courage_full'
-  | 'new_week'
+type NotificationTrigger = 'reminder_streak' | 'reminder_fresh' | 'reminder_dry_spell'
 
 interface PushNotification {
   trigger: NotificationTrigger
@@ -49,39 +42,20 @@ interface PushNotification {
 
 const APP_NAME = 'Stop Making Excuses'
 
-const STREAK_DYING = [
-  '🚨 Your dating streak is about to die.',
-  "Your streak doesn't care about your excuses 😂",
-  "Don't break the streak. Just saying 😈",
-  'Hours left. The streak is watching you not open this app.',
+const REMINDER_STREAK = [
+  '🚨 Your streak dies at midnight. Just saying.',
+  "Don't break the streak. You've got a few hours 😈",
+  'Streak on the line. No pressure, but also — pressure.',
 ]
-const INACTIVITY_MILD = [
-  "👀 It's been 3 days. We both know you're not 'just busy'.",
-  'Your weekly thing is still sitting there. Unopened. Judging you.',
-  'Three days of silence. Bold strategy.',
-  "Just a nudge — this week's still wide open.",
+const REMINDER_FRESH = [
+  "👀 Today's still open if you want it.",
+  'One small thing, whenever tonight works.',
+  'No streak to protect, no reason not to.',
 ]
-const INACTIVITY_SEVERE = [
-  "Okay queen, we're not finding anyone from the couch 😂",
-  "It's been a week. The app remembers. I remember.",
-  "Streak's basically a ghost at this point. Bring it back?",
-  'This is the part where you prove me wrong.',
+const REMINDER_DRY_SPELL = [
+  "It's been a while. Still here whenever you're ready.",
+  'No rush. The app remembers you exist though.',
 ]
-const VILLAIN_ARC = [
-  'You spent 3 weeks saying "maybe next week". This is your villain origin story.',
-  "Three weeks. Even I'm judging a little. Come back?",
-  'Okay, the plot needs you to show up now.',
-]
-const WEEK_COMPLETE = [
-  'HOLY SHIT YOU ACTUALLY DID IT 🎉',
-  'She did the thing. Screenshotting this for the group chat.',
-  'Maya has been notified. She is losing it 👀',
-]
-const COURAGE_FULL = [
-  'Your Courage is fully charged and just sitting there 👀',
-  'Full Courage bar. What are we waiting for?',
-]
-const NEW_WEEK = ['New week. New chance to be brave 🐣', "Clean slate. Let's go."]
 
 function pick(list: string[], seed: number): string {
   return list[Math.abs(seed) % list.length]
@@ -91,34 +65,15 @@ function notif(trigger: NotificationTrigger, body: string): PushNotification {
   return { trigger, title: APP_NAME, body }
 }
 
-function nextPushNotification(
-  s: PlayerState,
-  daysIn: number,
-  seed: number,
-): PushNotification | null {
-  if (s.weekStatus === 'done') return notif('week_complete', pick(WEEK_COMPLETE, seed))
-  if (s.weekStatus === 'frozen') return null
+function eveningReminder(s: PlayerState, seed: number): PushNotification | null {
+  if (s.dayStatus !== 'open') return null
 
-  const trailing = s.history.slice(-3)
-  if (trailing.length === 3 && trailing.every((w) => w.status === 'missed')) {
-    return notif('villain_arc', pick(VILLAIN_ARC, seed))
-  }
-  if (s.streakCurrent >= 1 && daysIn >= 6) {
-    return notif('streak_dying', pick(STREAK_DYING, seed))
-  }
-  if (daysIn >= 6) return notif('inactivity_severe', pick(INACTIVITY_SEVERE, seed))
-  if (daysIn >= 3) return notif('inactivity_mild', pick(INACTIVITY_MILD, seed))
-  if (daysIn === 0) return notif('new_week', pick(NEW_WEEK, seed))
-  if (s.courage >= COURAGE_MAX) return notif('courage_full', pick(COURAGE_FULL, seed))
-  return null
-}
+  const trailing = s.history.slice(-7)
+  const longDrySpell = trailing.length === 7 && trailing.every((d) => d.status === 'missed')
 
-const MS_DAY = 24 * 60 * 60 * 1000
-const MS_WEEK = 7 * MS_DAY
-const EPOCH = new Date('2024-01-01T00:00:00Z').getTime()
-
-function daysIntoWeek(now: number = Date.now()): number {
-  return Math.floor(((now - EPOCH) % MS_WEEK) / MS_DAY)
+  if (longDrySpell) return notif('reminder_dry_spell', pick(REMINDER_DRY_SPELL, seed))
+  if (s.streakCurrent >= 1) return notif('reminder_streak', pick(REMINDER_STREAK, seed))
+  return notif('reminder_fresh', pick(REMINDER_FRESH, seed))
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -155,13 +110,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const player = stateRow.data as PlayerState
-  const notification = nextPushNotification(player, daysIntoWeek(), player.weekIndex)
+  const notification = eveningReminder(player, player.dayIndex)
 
   if (!notification) {
     res.status(200).json({ sent: false, reason: 'nothing to say right now' })
     return
   }
 
+  // Same trigger as last time, sent recently — skip so this doesn't double
+  // up if the cron fires twice in a short window for any reason.
   const sentRecently =
     logRow?.last_trigger === notification.trigger &&
     logRow?.last_sent_at &&

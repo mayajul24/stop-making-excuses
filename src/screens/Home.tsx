@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
 import type { Difficulty, Reaction } from '../types'
-import { TIER_ORDER, TIERS, canAfford, easiestAffordable } from '../lib/game'
+import { TIER_ORDER, TIERS } from '../lib/game'
 import { buildPath } from '../lib/path'
 import { homeVoice } from '../lib/voice'
-import { daysLeftInWeek } from '../lib/calendar'
 import { usePlayer } from '../state/playerStore'
 import { Path } from '../components/Path'
+import { StreakFlame } from '../components/StreakFlame'
 import './Home.css'
 
 const REACTIONS: { id: Reaction; emoji: string; label: string }[] = [
@@ -18,30 +18,21 @@ const REACTIONS: { id: Reaction; emoji: string; label: string }[] = [
 
 /*
   Mirrors the two-tier hierarchy from Duolingo's real unit bar + lesson card:
-  the pinned green bar carries the week-level status (context, always true),
+  the pinned green bar carries the day-level status (context, always true),
   the docked card at the bottom carries the specific mission (the one thing
   she can act on right now). They should never say the same sentence twice.
 */
-function statusLine(status: 'open' | 'done' | 'frozen' | 'missed', hasTier: boolean) {
-  if (status === 'done') return 'Nice work this week'
-  if (status === 'frozen') return 'Resting this week'
-  if (!hasTier) return 'Out of courage'
+function statusLine(status: 'open' | 'done' | 'frozen' | 'missed') {
+  if (status === 'done') return 'Nice work today'
+  if (status === 'frozen') return 'Resting today'
   return 'Choose your challenge'
 }
 
 export function Home() {
-  const {
-    player,
-    markDone,
-    freezeWeek,
-    chooseEasier,
-    refillCourage,
-    setReaction,
-    addReflection,
-  } = usePlayer()
+  const { player, markDone, freezeToday, chooseEasier, setReaction, addReflection } =
+    usePlayer()
 
-  const daysLeft = useMemo(() => daysLeftInWeek(), [])
-  const voice = useMemo(() => homeVoice(player, daysLeft), [player, daysLeft])
+  const voice = useMemo(() => homeVoice(player), [player])
   const nodes = useMemo(() => buildPath(player), [player])
 
   // A session-only override so ⇄ and "I'm anxious" can change which tier is
@@ -51,18 +42,16 @@ export function Home() {
   const [easierBanner, setEasierBanner] = useState(false)
   const [reflectionText, setReflectionText] = useState('')
 
-  // Defaults to the gentlest thing she can afford, not the hardest — ⇄ is
-  // how she opts into something bigger.
-  const suggested = easiestAffordable(player)
-  const selected = override ?? suggested
-  const tier = selected ? TIERS[selected] : null
+  // Always defaults to Easy, not whatever's "hardest available" — there's
+  // no resource gating difficulty anymore (see game.ts), so the app has to
+  // be the one holding the line on suggesting the gentlest thing first.
+  // Escalating is something she opts into via ⇄, never the default.
+  const selected = override ?? 'easy'
+  const tier = TIERS[selected]
 
   function cycleDifficulty() {
-    const affordable = TIER_ORDER.filter((d) => canAfford(player, d))
-    if (affordable.length <= 1) return
-    const current = selected ?? affordable[0]
-    const i = affordable.indexOf(current)
-    setOverride(affordable[(i + 1) % affordable.length])
+    const i = TIER_ORDER.indexOf(selected)
+    setOverride(TIER_ORDER[(i + 1) % TIER_ORDER.length])
     setEasierBanner(false)
   }
 
@@ -71,15 +60,12 @@ export function Home() {
   // stays "a little smaller" instead of overcorrecting to the floor.
   function handleAnxious() {
     chooseEasier()
-    const affordable = TIER_ORDER.filter((d) => canAfford(player, d))
-    const current = selected ?? affordable[0]
-    const i = affordable.indexOf(current)
-    setOverride(affordable[Math.max(0, i - 1)])
+    const i = TIER_ORDER.indexOf(selected)
+    setOverride(TIER_ORDER[Math.max(0, i - 1)])
     setEasierBanner(true)
   }
 
   function handleMarkDone() {
-    if (!selected) return
     markDone(selected)
     setOverride(null)
     setEasierBanner(false)
@@ -91,7 +77,7 @@ export function Home() {
   }
 
   function renderMissionCard() {
-    if (player.weekStatus === 'done') {
+    if (player.dayStatus === 'done') {
       return (
         <div className="donepanel rise">
           <div className="reactionrow">
@@ -99,7 +85,7 @@ export function Home() {
               <button
                 key={r.id}
                 className="reactionchip"
-                data-picked={player.weekReaction === r.id}
+                data-picked={player.dayReaction === r.id}
                 onClick={() => setReaction(r.id)}
               >
                 {r.emoji} {r.label}
@@ -119,30 +105,18 @@ export function Home() {
             </button>
           )}
 
-          <p className="nextweeknote">
-            Next week opens on its own once this one's really over.
+          <p className="nextdaynote">
+            Tomorrow opens on its own once today's really over.
           </p>
         </div>
       )
     }
 
-    if (player.weekStatus === 'frozen') {
+    if (player.dayStatus === 'frozen') {
       return (
         <div className="donepanel donepanel--frozen rise">
-          <span className="donepanel__title">Week on ice ❄️</span>
+          <span className="donepanel__title">Today's on ice ❄️</span>
           <span className="donepanel__sub">Streak protected.</span>
-        </div>
-      )
-    }
-
-    if (!tier) {
-      return (
-        <div className="misscard misscard--rose">
-          <span className="misscard__eyebrow">Out of courage</span>
-          <span className="misscard__title">Refill to keep going</span>
-          <button className="misscard__pill misscard__pill--rose" onClick={refillCourage}>
-            👀 Look at profiles — free
-          </button>
         </div>
       )
     }
@@ -155,15 +129,12 @@ export function Home() {
           </div>
         )}
         <div className="secondary-row">
-          <button className="secondary-btn" onClick={refillCourage}>
-            👀 Free look +1
-          </button>
           <button className="secondary-btn" onClick={handleAnxious}>
             😰 I'm anxious
           </button>
           <button
             className="secondary-btn"
-            onClick={freezeWeek}
+            onClick={freezeToday}
             disabled={player.freezeTokens <= 0}
           >
             ❄️ Freeze ({player.freezeTokens})
@@ -178,15 +149,13 @@ export function Home() {
             <button className="misscard__pill" onClick={handleMarkDone}>
               DONE ✓
             </button>
-            {TIER_ORDER.filter((d) => canAfford(player, d)).length > 1 && (
-              <button
-                className="misscard__swap"
-                onClick={cycleDifficulty}
-                aria-label="Try a different difficulty"
-              >
-                ⇄
-              </button>
-            )}
+            <button
+              className="misscard__swap"
+              onClick={cycleDifficulty}
+              aria-label="Try a different difficulty"
+            >
+              ⇄
+            </button>
           </div>
         </div>
       </>
@@ -199,10 +168,8 @@ export function Home() {
       <header className="hud">
         <div className="vitals">
           <span className="vital vital--streak">
-            🔥 <b>{player.streakCurrent}</b>
-          </span>
-          <span className="vital vital--courage">
-            💗 <b>{player.courage}</b>
+            <StreakFlame lit={player.streakCurrent > 0} size={20} />
+            <b>{player.streakCurrent}</b>
           </span>
           <span className="vital vital--xp">
             ⭐ <b>{player.xp}</b>
@@ -214,9 +181,9 @@ export function Home() {
 
         <div className="unitbar">
           <div className="unitbar__text">
-            <span className="unitbar__eyebrow">Week {player.weekIndex}</span>
+            <span className="unitbar__eyebrow">Today</span>
             <span className="unitbar__title">
-              {statusLine(player.weekStatus, !!tier)}
+              {statusLine(player.dayStatus)}
             </span>
           </div>
         </div>
