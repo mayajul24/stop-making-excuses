@@ -137,11 +137,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       JSON.stringify({ title: notification.title, body: notification.body }),
     )
   } catch (err) {
-    const status = (err as { statusCode?: number }).statusCode
+    const webPushErr = err as { statusCode?: number; body?: string; headers?: unknown }
+    const status = webPushErr.statusCode
     if (status === 404 || status === 410) {
       await supabase.from('push_subscription').delete().eq('id', 1)
     }
-    res.status(200).json({ sent: false, error: String(err) })
+    // TEMPORARY: surfacing the real statusCode/body so a vague
+    // "unexpected response code" can actually be diagnosed. Remove once
+    // push delivery is confirmed working end to end.
+    res.status(200).json({
+      sent: false,
+      error: String(err),
+      debugStatusCode: status ?? null,
+      debugBody: webPushErr.body ?? null,
+    })
     return
   }
 
