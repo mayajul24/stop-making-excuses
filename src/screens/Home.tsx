@@ -93,25 +93,8 @@ export function Home() {
 
   function renderMissionCard() {
     if (player.weekStatus === 'done') {
-      // Not `tier` — that now reflects the *next* suggested mission (likely
-      // null, since courage was just spent), not what she actually did.
-      const completedTier = player.weekDifficulty
-        ? TIERS[player.weekDifficulty]
-        : null
       return (
         <div className="donepanel rise">
-          <div className="donepanel__head">
-            <span className="donepanel__title">
-              {player.weekMarkedAnxious
-                ? '😬 Anxious, and did it anyway.'
-                : 'That counts.'}
-            </span>
-            <span className="donepanel__sub">
-              {completedTier ? `${completedTier.done} · ` : ''}Maya's been
-              notified 👀
-            </span>
-          </div>
-
           {!player.weekMarkedAnxious ? (
             <button className="anxioustoggle" onClick={markAnxious}>
               😰 Honestly? I felt anxious about this — claim +{10} bonus

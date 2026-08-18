@@ -341,12 +341,6 @@
   text-align: center;
 }
 
-.donepanel__head {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
 .donepanel__title {
   font-family: var(--display);
   font-size: 17px;
