@@ -86,11 +86,34 @@ function catchUpToNow(s: PlayerState): PlayerState {
   return next
 }
 
+// Guards against a shape from before some past PlayerState field rename
+// (there's no schema version tag, so this is the only thing standing
+// between a stale save and a silently broken app). Without this,
+// JSON.parse(raw) as PlayerState is just a type *assertion* — TypeScript
+// trusts it unconditionally, but at runtime a save from an old field-name
+// era comes back with dayIndex/dayStatus simply undefined. That doesn't
+// throw anywhere: catchUpToNow's `next.dayIndex < target` is `undefined <
+// number`, which JavaScript evaluates as false, so the catch-up loop
+// silently never runs, and the broken object passes through untouched —
+// looking like an ordinary open day in the UI while every day-index check
+// server-side quietly fails.
+function isValidPlayerState(v: unknown): v is PlayerState {
+  if (!v || typeof v !== 'object') return false
+  const s = v as Record<string, unknown>
+  return (
+    typeof s.dayIndex === 'number' &&
+    typeof s.dayStatus === 'string' &&
+    Array.isArray(s.history)
+  )
+}
+
 function loadPlayer(): PlayerState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return freshPlayer()
-    return catchUpToNow(JSON.parse(raw) as PlayerState)
+    const parsed: unknown = JSON.parse(raw)
+    if (!isValidPlayerState(parsed)) return freshPlayer()
+    return catchUpToNow(parsed)
   } catch {
     return freshPlayer()
   }
