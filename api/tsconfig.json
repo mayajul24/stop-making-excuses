@@ -10,5 +10,5 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["./**/*.ts", "../src/lib/notifications.ts", "../src/lib/calendar.ts", "../src/lib/game.ts", "../src/types.ts"]
+  "include": ["./**/*.ts"]
 }
