@@ -118,8 +118,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // Same trigger as last time, sent recently — skip so this doesn't double
-  // up if the cron fires twice in a short window for any reason.
+  // up if the cron fires twice in a short window for any reason. Bypassed
+  // by ?force=1, already behind the same CRON_SECRET auth as the rest of
+  // this endpoint, so a real test send (e.g. previewing an icon/copy
+  // change) doesn't have to wait out a 20-hour window.
   const sentRecently =
+    req.query.force !== '1' &&
     logRow?.last_trigger === notification.trigger &&
     logRow?.last_sent_at &&
     Date.now() - new Date(logRow.last_sent_at).getTime() < 20 * 60 * 60 * 1000
