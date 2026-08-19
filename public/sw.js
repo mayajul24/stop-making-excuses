@@ -2,6 +2,21 @@
 // and outside TypeScript's reach, in their own worker context with no
 // access to anything in src/.
 
+// Without these, a new service worker sits "waiting" until every tab
+// running the old one is closed — which for a PWA on a phone can mean
+// never, since it's rarely fully closed. skipWaiting() lets it activate
+// immediately; clients.claim() lets it take control of the open page
+// right away instead of only on the next load. This is what makes a
+// change like a new notification icon actually show up without her
+// needing to manually clear site data.
+self.addEventListener('install', () => {
+  self.skipWaiting()
+})
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim())
+})
+
 self.addEventListener('push', (event) => {
   let payload = { title: 'Stop Making Excuses', body: 'Something happened.' }
   try {
