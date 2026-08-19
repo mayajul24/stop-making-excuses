@@ -31,16 +31,19 @@ self.addEventListener('push', (event) => {
   // parsed at all.
   //
   // badge is a separate slot from icon: Android renders it small and
-  // monochrome (masking out color/detail itself) for the status bar and
-  // the compact stacked-notification row, while icon is the larger full
-  // color image. Never setting one meant Android had to improvise that
-  // compact layout — possibly why the title was getting squeezed down to
-  // "Stop Making Exc…" when several notifications stacked together.
+  // monochrome (masking out color/detail itself, using only the alpha
+  // channel as a stencil) for the status bar and the compact
+  // stacked-notification row, while icon is the larger full color image.
+  // pwa-192.png is an opaque colored square — no transparency for Android
+  // to mask against — which is likely why the status bar was falling back
+  // to a generic bell instead of showing anything shaped like the app.
+  // badge-icon.png is a plain white silhouette on a transparent
+  // background, built specifically for this slot.
   event.waitUntil(
     self.registration.showNotification(payload.title, {
       body: payload.body,
       icon: payload.icon || '/notification-icon-annoyed.png',
-      badge: '/pwa-192.png',
+      badge: '/badge-icon.png',
     }),
   )
 })
