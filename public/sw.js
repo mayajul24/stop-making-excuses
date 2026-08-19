@@ -10,10 +10,14 @@ self.addEventListener('push', (event) => {
     // Non-JSON payload — fall back to the default above rather than crash.
   }
 
+  // The character herself, unimpressed — rendered from Mascot.tsx's
+  // 'unimpressed' mood (same SVG the in-app path screen uses), not the
+  // generic app icon. Every reminder that reaches this far is a nag by
+  // definition, so the face on it should say so before she even opens it.
   event.waitUntil(
     self.registration.showNotification(payload.title, {
       body: payload.body,
-      icon: '/pwa-192.png',
+      icon: '/notification-icon-annoyed.png',
     }),
   )
 })
