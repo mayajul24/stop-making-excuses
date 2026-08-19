@@ -10,12 +10,10 @@ self.addEventListener('push', (event) => {
     // Non-JSON payload — fall back to the default above rather than crash.
   }
 
-  // No icon/badge — this project doesn't have an app icon asset yet, so
-  // pointing at one would 404 silently. The OS falls back to its own
-  // default notification icon in the meantime.
   event.waitUntil(
     self.registration.showNotification(payload.title, {
       body: payload.body,
+      icon: '/pwa-192.png',
     }),
   )
 })
