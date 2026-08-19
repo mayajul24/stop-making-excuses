@@ -20,9 +20,22 @@ export interface PushNotification {
   trigger: NotificationTrigger
   title: string
   body: string
+  icon: string
 }
 
 const APP_NAME = 'Stop Making Excuses'
+
+// A dying streak gets the alarmed face (wide eyes, red background) — every
+// other reminder gets the calm unimpressed one. The closest a PWA can get
+// to Duolingo's icon-changes-near-midnight trick: the actual home-screen
+// icon can't be swapped at runtime (no web API for that), but the icon
+// shown *on the notification itself* can vary per trigger.
+const ICON_CALM = '/notification-icon-annoyed.png'
+const ICON_ALARMED = '/notification-icon-alarmed.png'
+
+function iconFor(trigger: NotificationTrigger): string {
+  return trigger === 'reminder_streak' ? ICON_ALARMED : ICON_CALM
+}
 
 // She has an active streak and hasn't done today's yet — protect it.
 const REMINDER_STREAK = [
@@ -49,7 +62,7 @@ function pick(list: string[], seed: number): string {
 }
 
 function notif(trigger: NotificationTrigger, body: string): PushNotification {
-  return { trigger, title: APP_NAME, body }
+  return { trigger, title: APP_NAME, body, icon: iconFor(trigger) }
 }
 
 /**

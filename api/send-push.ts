@@ -38,9 +38,21 @@ interface PushNotification {
   trigger: NotificationTrigger
   title: string
   body: string
+  icon: string
 }
 
 const APP_NAME = 'Stop Making Excuses'
+
+// A dying streak gets the alarmed face (wide eyes, red background) — every
+// other reminder gets the calm unimpressed one. Kept in sync by hand with
+// src/lib/notifications.ts's identical iconFor(), same constraint as the
+// rest of this file.
+const ICON_CALM = '/notification-icon-annoyed.png'
+const ICON_ALARMED = '/notification-icon-alarmed.png'
+
+function iconFor(trigger: NotificationTrigger): string {
+  return trigger === 'reminder_streak' ? ICON_ALARMED : ICON_CALM
+}
 
 const REMINDER_STREAK = [
   '🚨 Your streak dies at midnight. Just saying.',
@@ -62,7 +74,7 @@ function pick(list: string[], seed: number): string {
 }
 
 function notif(trigger: NotificationTrigger, body: string): PushNotification {
-  return { trigger, title: APP_NAME, body }
+  return { trigger, title: APP_NAME, body, icon: iconFor(trigger) }
 }
 
 function eveningReminder(s: PlayerState, seed: number): PushNotification | null {
@@ -138,7 +150,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     await webpush.sendNotification(
       { endpoint: subRow.endpoint, keys: { p256dh: subRow.p256dh, auth: subRow.auth } },
-      JSON.stringify({ title: notification.title, body: notification.body }),
+      JSON.stringify({
+        title: notification.title,
+        body: notification.body,
+        icon: notification.icon,
+      }),
     )
   } catch (err) {
     // 410/404 means the browser revoked the subscription — clear it so we

@@ -25,14 +25,14 @@ self.addEventListener('push', (event) => {
     // Non-JSON payload — fall back to the default above rather than crash.
   }
 
-  // The character herself, unimpressed — rendered from Mascot.tsx's
-  // 'unimpressed' mood (same SVG the in-app path screen uses), not the
-  // generic app icon. Every reminder that reaches this far is a nag by
-  // definition, so the face on it should say so before she even opens it.
+  // The server picks which face to send (calm vs. alarmed, depending on
+  // whether a streak is actually on the line — see api/send-push.ts's
+  // iconFor()). Falls back to the calm one for any payload that predates
+  // this field, or a non-JSON payload that never parsed at all.
   event.waitUntil(
     self.registration.showNotification(payload.title, {
       body: payload.body,
-      icon: '/notification-icon-annoyed.png',
+      icon: payload.icon || '/notification-icon-annoyed.png',
     }),
   )
 })
