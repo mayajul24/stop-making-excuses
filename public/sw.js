@@ -25,14 +25,22 @@ self.addEventListener('push', (event) => {
     // Non-JSON payload — fall back to the default above rather than crash.
   }
 
-  // The server picks which face to send (calm vs. alarmed, depending on
-  // whether a streak is actually on the line — see api/send-push.ts's
-  // iconFor()). Falls back to the calm one for any payload that predates
-  // this field, or a non-JSON payload that never parsed at all.
+  // The server picks which face to send (smiling vs. alarmed, depending on
+  // the time slot — see api/send-push.ts). Falls back to the calm one for
+  // any payload that predates this field, or a non-JSON payload that never
+  // parsed at all.
+  //
+  // badge is a separate slot from icon: Android renders it small and
+  // monochrome (masking out color/detail itself) for the status bar and
+  // the compact stacked-notification row, while icon is the larger full
+  // color image. Never setting one meant Android had to improvise that
+  // compact layout — possibly why the title was getting squeezed down to
+  // "Stop Making Exc…" when several notifications stacked together.
   event.waitUntil(
     self.registration.showNotification(payload.title, {
       body: payload.body,
       icon: payload.icon || '/notification-icon-annoyed.png',
+      badge: '/pwa-192.png',
     }),
   )
 })
