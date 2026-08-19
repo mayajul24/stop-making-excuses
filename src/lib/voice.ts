@@ -5,16 +5,16 @@ import type { PlayerState } from '../types'
   teasing — never guilt-tripping, never a motivational poster. The goal is
   "okay, maybe I actually can do this," never "ugh, I failed." A missed day
   gets a nudge, not a scolding — nothing here should read as disappointed.
+
+  Only the mascot's own speech bubble on the path carries this anymore —
+  there used to also be a banner box at the top of Home with a matching
+  title/subtitle, removed because it read as redundant clutter sitting
+  right above the same character saying a similar thing.
 */
 
 export type Mood = 'idle' | 'smug' | 'unimpressed' | 'proud'
 
-export type Tone = 'calm' | 'urgent' | 'win'
-
 export interface HomeVoice {
-  bannerTitle: string
-  bannerSub: string
-  bannerTone: Tone
   mascotLine: string
   mascotMood: Mood
 }
@@ -36,23 +36,11 @@ export function homeVoice(state: PlayerState): HomeVoice {
   const seed = state.dayIndex
 
   if (state.dayStatus === 'done') {
-    return {
-      bannerTitle: 'HOLY SHIT YOU ACTUALLY DID IT',
-      bannerSub: `${state.streakCurrent} days in a row. Maya has been notified 👀`,
-      bannerTone: 'win',
-      mascotLine: pick(PROUD_LINES, seed),
-      mascotMood: 'proud',
-    }
+    return { mascotLine: pick(PROUD_LINES, seed), mascotMood: 'proud' }
   }
 
   if (state.dayStatus === 'frozen') {
-    return {
-      bannerTitle: 'TODAY’S ON ICE ❄️',
-      bannerSub: 'Your streak is safe. See you tomorrow.',
-      bannerTone: 'calm',
-      mascotLine: 'Resting is allowed ❄️',
-      mascotMood: 'idle',
-    }
+    return { mascotLine: 'Resting is allowed ❄️', mascotMood: 'idle' }
   }
 
   // 21 missed days is the same real-world dry spell the old weekly version
@@ -60,25 +48,10 @@ export function homeVoice(state: PlayerState): HomeVoice {
   // shrank by, not just relabeled.
   const trailing = state.history.slice(-21)
   if (trailing.length === 21 && trailing.every((d) => d.status === 'missed')) {
-    return {
-      bannerTitle: 'Been a minute since you showed up.',
-      bannerSub: 'No pressure — one small thing, whenever you’re ready.',
-      bannerTone: 'calm',
-      mascotLine: 'Still here 👀',
-      mascotMood: 'idle',
-    }
+    return { mascotLine: 'Still here 👀', mascotMood: 'idle' }
   }
 
   return {
-    bannerTitle:
-      state.streakCurrent > 0
-        ? `🔥 ${state.streakCurrent} days of showing up`
-        : 'Okay queen, we’re not finding a husband from the couch 😂',
-    bannerSub:
-      state.streakCurrent > 0
-        ? 'New day, one small thing. Whatever size feels okay.'
-        : 'Day one. Nothing to lose.',
-    bannerTone: 'calm',
     mascotLine: pick(IDLE_LINES, seed),
     mascotMood: state.streakCurrent >= 4 ? 'smug' : 'idle',
   }

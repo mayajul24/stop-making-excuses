@@ -9,12 +9,15 @@ import webpush from 'web-push'
   bundler not following relative imports that cross the api/ folder
   boundary — api/classify.ts in the sibling shopping-list project avoids
   the same thing for the same reason. This logic must be kept in sync by
-  hand with src/lib/notifications.ts's eveningReminder(); there's no
-  automatic way to share it given that constraint.
+  hand with src/lib/notifications.ts's eveningNudge()/urgentNudge(); there's
+  no automatic way to share it given that constraint.
 
-  Reminders only, evening-only — no celebration push. Maya was explicit:
-  encourage her in-app, after she's already done something; a push
-  notification's only job is reaching her if today never happened.
+  Two fixed daily check-ins, not a streak-aware pool — Maya's direction:
+  copy (and icon) depends on the hour, not on state. vercel.json points two
+  separate cron entries at this same function, distinguished by ?slot=.
+  Neither fires if today's already done or frozen — celebration stays
+  in-app, a push notification's only job is reaching her if today never
+  happened.
 */
 
 type Difficulty = 'easy' | 'medium' | 'hard' | 'nightmare'
@@ -32,7 +35,7 @@ interface PlayerState {
   history: DayRecord[]
 }
 
-type NotificationTrigger = 'reminder_streak' | 'reminder_fresh' | 'reminder_dry_spell'
+type NotificationTrigger = 'evening_nudge' | 'urgent_nudge'
 
 interface PushNotification {
   trigger: NotificationTrigger
@@ -43,54 +46,46 @@ interface PushNotification {
 
 const APP_NAME = 'Stop Making Excuses'
 
-// A dying streak gets the alarmed face (wide eyes, red background) — every
-// other reminder gets the calm unimpressed one. Kept in sync by hand with
-// src/lib/notifications.ts's identical iconFor(), same constraint as the
-// rest of this file.
-const ICON_CALM = '/notification-icon-annoyed.png'
+const ICON_SMILING = '/notification-icon-smiling.png'
 const ICON_ALARMED = '/notification-icon-alarmed.png'
 
-function iconFor(trigger: NotificationTrigger): string {
-  return trigger === 'reminder_streak' ? ICON_ALARMED : ICON_CALM
-}
+// 8pm: friendly, not urgent — plenty of the evening left.
+const EVENING_LINES = [
+  "Time to talk to boys 💬 (or girls, I don't judge)",
+  "Prime texting hours. Someone's waiting to hear from you 👀",
+  'Go on, say hi to someone 💌',
+]
 
-const REMINDER_STREAK = [
-  '🚨 Your streak dies at midnight. Just saying.',
-  "Don't break the streak. You've got a few hours 😈",
-  'Streak on the line. No pressure, but also — pressure.',
-]
-const REMINDER_FRESH = [
-  "👀 Today's still open if you want it.",
-  'One small thing, whenever tonight works.',
-  'No streak to protect, no reason not to.',
-]
-const REMINDER_DRY_SPELL = [
-  "It's been a while. Still here whenever you're ready.",
-  'No rush. The app remembers you exist though.',
+// 10:30pm: today's nearly out of runway.
+const URGENT_LINES = [
+  'HURRY UP!! NO EXCUSES!',
+  "🚨 Midnight's coming. Do the thing.",
+  "Last call before today's gone. No excuses.",
 ]
 
 function pick(list: string[], seed: number): string {
   return list[Math.abs(seed) % list.length]
 }
 
-function notif(trigger: NotificationTrigger, body: string): PushNotification {
-  return { trigger, title: APP_NAME, body, icon: iconFor(trigger) }
+function eveningNudge(s: PlayerState, seed: number): PushNotification | null {
+  if (s.dayStatus !== 'open') return null
+  return { trigger: 'evening_nudge', title: APP_NAME, body: pick(EVENING_LINES, seed), icon: ICON_SMILING }
 }
 
-function eveningReminder(s: PlayerState, seed: number): PushNotification | null {
+function urgentNudge(s: PlayerState, seed: number): PushNotification | null {
   if (s.dayStatus !== 'open') return null
-
-  const trailing = s.history.slice(-7)
-  const longDrySpell = trailing.length === 7 && trailing.every((d) => d.status === 'missed')
-
-  if (longDrySpell) return notif('reminder_dry_spell', pick(REMINDER_DRY_SPELL, seed))
-  if (s.streakCurrent >= 1) return notif('reminder_streak', pick(REMINDER_STREAK, seed))
-  return notif('reminder_fresh', pick(REMINDER_FRESH, seed))
+  return { trigger: 'urgent_nudge', title: APP_NAME, body: pick(URGENT_LINES, seed), icon: ICON_ALARMED }
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
     res.status(401).json({ error: 'Unauthorized' })
+    return
+  }
+
+  const slot = req.query.slot
+  if (slot !== 'evening' && slot !== 'urgent') {
+    res.status(400).json({ error: "Missing or invalid ?slot= (expected 'evening' or 'urgent')" })
     return
   }
 
@@ -122,7 +117,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const player = stateRow.data as PlayerState
-  const notification = eveningReminder(player, player.dayIndex)
+  const notification =
+    slot === 'evening'
+      ? eveningNudge(player, player.dayIndex)
+      : urgentNudge(player, player.dayIndex)
 
   if (!notification) {
     res.status(200).json({ sent: false, reason: 'nothing to say right now' })

@@ -6,15 +6,16 @@ import type { PlayerState } from '../types'
   backend: something to hold her subscription and fire on a schedule even
   when the app isn't open (see api/send-push.ts).
 
-  Reminders only, evening-only, matching Maya's explicit direction: "the
-  nice 'holly shit you did it' notifications are not needed. we should
-  encourage her AFTER she did the challenge" — celebration happens in-app
-  (see voice.ts's 'done' banner), where she's actually looking at it. A
-  push notification's only job here is the thing an in-app banner can't
-  do: reach her at 9pm if today never happened.
+  Two fixed daily check-ins, not a streak-aware pool — Maya's direction:
+  copy (and icon) should depend on the hour, not on state. An 8pm nudge
+  with a smiling face if today's still open, and a sharper 10:30pm one
+  with an alarmed face if it's *still* open by then. Neither fires if
+  she's already done today's or used a freeze — celebration stays in-app
+  (see voice.ts), a push notification's only job is reaching her if today
+  never happened.
 */
 
-export type NotificationTrigger = 'reminder_streak' | 'reminder_fresh' | 'reminder_dry_spell'
+export type NotificationTrigger = 'evening_nudge' | 'urgent_nudge'
 
 export interface PushNotification {
   trigger: NotificationTrigger
@@ -25,59 +26,45 @@ export interface PushNotification {
 
 const APP_NAME = 'Stop Making Excuses'
 
-// A dying streak gets the alarmed face (wide eyes, red background) — every
-// other reminder gets the calm unimpressed one. The closest a PWA can get
-// to Duolingo's icon-changes-near-midnight trick: the actual home-screen
-// icon can't be swapped at runtime (no web API for that), but the icon
-// shown *on the notification itself* can vary per trigger.
-const ICON_CALM = '/notification-icon-annoyed.png'
+const ICON_SMILING = '/notification-icon-smiling.png'
 const ICON_ALARMED = '/notification-icon-alarmed.png'
 
-function iconFor(trigger: NotificationTrigger): string {
-  return trigger === 'reminder_streak' ? ICON_ALARMED : ICON_CALM
-}
-
-// She has an active streak and hasn't done today's yet — protect it.
-const REMINDER_STREAK = [
-  '🚨 Your streak dies at midnight. Just saying.',
-  "Don't break the streak. You've got a few hours 😈",
-  'Streak on the line. No pressure, but also — pressure.',
+// 8pm: friendly, not urgent — plenty of the evening left.
+const EVENING_LINES = [
+  "Time to talk to boys 💬 (or girls, I don't judge)",
+  "Prime texting hours. Someone's waiting to hear from you 👀",
+  'Go on, say hi to someone 💌',
 ]
 
-// No streak riding on it — a plain, low-stakes nudge.
-const REMINDER_FRESH = [
-  "👀 Today's still open if you want it.",
-  'One small thing, whenever tonight works.',
-  'No streak to protect, no reason not to.',
-]
-
-// A real dry spell — gentle, not guilt-tripping.
-const REMINDER_DRY_SPELL = [
-  "It's been a while. Still here whenever you're ready.",
-  'No rush. The app remembers you exist though.',
+// 10:30pm: today's nearly out of runway.
+const URGENT_LINES = [
+  'HURRY UP!! NO EXCUSES!',
+  "🚨 Midnight's coming. Do the thing.",
+  "Last call before today's gone. No excuses.",
 ]
 
 function pick(list: string[], seed: number): string {
   return list[Math.abs(seed) % list.length]
 }
 
-function notif(trigger: NotificationTrigger, body: string): PushNotification {
-  return { trigger, title: APP_NAME, body, icon: iconFor(trigger) }
+/** 8pm check-in. Null if there's nothing to nudge about. */
+export function eveningNudge(s: PlayerState, seed: number): PushNotification | null {
+  if (s.dayStatus !== 'open') return null
+  return {
+    trigger: 'evening_nudge',
+    title: APP_NAME,
+    body: pick(EVENING_LINES, seed),
+    icon: ICON_SMILING,
+  }
 }
 
-/**
- * Called once, in the evening (see vercel.json's cron schedule). Returns
- * null when there's nothing to send — she already did today's, she's
- * using a freeze on purpose, or nothing's wrong enough to interrupt her
- * for.
- */
-export function eveningReminder(s: PlayerState, seed: number): PushNotification | null {
-  if (s.dayStatus !== 'open') return null // done or frozen — nothing to nag about
-
-  const trailing = s.history.slice(-7)
-  const longDrySpell = trailing.length === 7 && trailing.every((d) => d.status === 'missed')
-
-  if (longDrySpell) return notif('reminder_dry_spell', pick(REMINDER_DRY_SPELL, seed))
-  if (s.streakCurrent >= 1) return notif('reminder_streak', pick(REMINDER_STREAK, seed))
-  return notif('reminder_fresh', pick(REMINDER_FRESH, seed))
+/** 10:30pm check-in — only fires if the 8pm one didn't land. */
+export function urgentNudge(s: PlayerState, seed: number): PushNotification | null {
+  if (s.dayStatus !== 'open') return null
+  return {
+    trigger: 'urgent_nudge',
+    title: APP_NAME,
+    body: pick(URGENT_LINES, seed),
+    icon: ICON_ALARMED,
+  }
 }

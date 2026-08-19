@@ -190,11 +190,6 @@ export function Home() {
       </header>
 
       <div className="home__body">
-        <div className={`banner banner--${voice.bannerTone} rise`}>
-          <strong className="banner__title">{voice.bannerTitle}</strong>
-          <span className="banner__sub">{voice.bannerSub}</span>
-        </div>
-
         <Path
           nodes={nodes}
           mascotLine={voice.mascotLine}
