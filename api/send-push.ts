@@ -152,6 +152,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         title: notification.title,
         body: notification.body,
         icon: notification.icon,
+        trigger: notification.trigger,
       }),
     )
   } catch (err) {

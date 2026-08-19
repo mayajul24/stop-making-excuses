@@ -44,20 +44,29 @@ self.addEventListener('push', (event) => {
       body: payload.body,
       icon: payload.icon || '/notification-icon-annoyed.png',
       badge: '/badge-icon.png',
+      // Same trigger replaces its own prior notification instead of
+      // stacking a new one on top of an unread one from earlier today.
+      tag: payload.trigger || 'stop-making-excuses',
     }),
   )
 })
 
 // Tapping the notification focuses an already-open tab instead of always
-// opening a fresh one.
+// opening a fresh one. It also clears every other notification this app
+// has showing — once she's back in the app to handle one nudge, the rest
+// (e.g. an earlier evening one still sitting there) are stale too.
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
   event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+    (async () => {
+      const stale = await self.registration.getNotifications()
+      stale.forEach((n) => n.close())
+
+      const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
       for (const client of clients) {
         if ('focus' in client) return client.focus()
       }
       if (self.clients.openWindow) return self.clients.openWindow('/')
-    }),
+    })(),
   )
 })
