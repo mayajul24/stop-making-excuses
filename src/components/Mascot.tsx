@@ -15,7 +15,6 @@ import './Mascot.css'
 */
 
 const HAIR = '#2e2019'
-const HAIR_MID = '#4a3327'
 const SKIN = '#e8b98f'
 const SKIN_SHADE = '#d9a679'
 const INK = '#2b2019'
@@ -51,13 +50,6 @@ const BACK_VOLUME: [number, number, number][] = [
   [101, 104, 15],
   [27, 128, 13],
   [93, 128, 13],
-]
-
-const BACK_HIGHLIGHTS: [number, number, number][] = [
-  [24, 40, 8],
-  [98, 42, 7],
-  [20, 90, 7],
-  [102, 92, 6.5],
 ]
 
 const FRONT_FRINGE: [number, number, number][] = [
@@ -166,7 +158,6 @@ export function Mascot({ mood = 'idle', size = 76 }: { mood?: Mood; size?: numbe
       {/* hair volume, behind everything — a curl cluster, not a smooth blob */}
       <g className="mascot__hairback">
         <Curls spots={BACK_VOLUME} fill={HAIR} />
-        <Curls spots={BACK_HIGHLIGHTS} fill={HAIR_MID} />
       </g>
 
       {/* shoulders + top */}
