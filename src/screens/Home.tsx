@@ -1,20 +1,13 @@
 import { useMemo, useState } from 'react'
-import type { Difficulty, Reaction } from '../types'
+import type { Difficulty } from '../types'
 import { TIER_ORDER, TIERS } from '../lib/game'
 import { buildPath } from '../lib/path'
 import { homeVoice } from '../lib/voice'
 import { usePlayer } from '../state/playerStore'
 import { Path } from '../components/Path'
 import { StreakFlame } from '../components/StreakFlame'
+import { StreakCelebration } from '../components/StreakCelebration'
 import './Home.css'
-
-const REACTIONS: { id: Reaction; emoji: string; label: string }[] = [
-  { id: 'great_date', emoji: '☕', label: 'Great date' },
-  { id: 'awkward', emoji: '😬', label: 'Awkward' },
-  { id: 'rough', emoji: '💀', label: 'Rough date' },
-  { id: 'ghosted', emoji: '👻', label: 'Ghosted' },
-  { id: 'second_date', emoji: '❤️', label: 'Second date' },
-]
 
 /*
   Mirrors the two-tier hierarchy from Duolingo's real unit bar + lesson card:
@@ -29,8 +22,7 @@ function statusLine(status: 'open' | 'done' | 'frozen' | 'missed') {
 }
 
 export function Home() {
-  const { player, markDone, freezeToday, chooseEasier, setReaction, addReflection } =
-    usePlayer()
+  const { player, markDone, freezeToday, chooseEasier } = usePlayer()
 
   const voice = useMemo(() => homeVoice(player), [player])
   const nodes = useMemo(() => buildPath(player), [player])
@@ -40,7 +32,11 @@ export function Home() {
   // player until she actually taps DONE.
   const [override, setOverride] = useState<Difficulty | null>(null)
   const [easierBanner, setEasierBanner] = useState(false)
-  const [reflectionText, setReflectionText] = useState('')
+
+  // Only true right after she taps DONE this session — revisiting Home
+  // later the same day (already done from an earlier visit) shouldn't
+  // replay the celebration.
+  const [celebrating, setCelebrating] = useState(false)
 
   // Always defaults to Easy, not whatever's "hardest available" — there's
   // no resource gating difficulty anymore (see game.ts), so the app has to
@@ -69,42 +65,14 @@ export function Home() {
     markDone(selected)
     setOverride(null)
     setEasierBanner(false)
-  }
-
-  function handleSaveReflection() {
-    addReflection(reflectionText)
-    setReflectionText('')
+    setCelebrating(true)
   }
 
   function renderMissionCard() {
     if (player.dayStatus === 'done') {
       return (
         <div className="donepanel rise">
-          <div className="reactionrow">
-            {REACTIONS.map((r) => (
-              <button
-                key={r.id}
-                className="reactionchip"
-                data-picked={player.dayReaction === r.id}
-                onClick={() => setReaction(r.id)}
-              >
-                {r.emoji} {r.label}
-              </button>
-            ))}
-          </div>
-
-          <textarea
-            className="reflectbox"
-            placeholder="Want to write how it felt? (optional)"
-            value={reflectionText}
-            onChange={(e) => setReflectionText(e.target.value)}
-          />
-          {reflectionText.trim() && (
-            <button className="savebtn" onClick={handleSaveReflection}>
-              Save thought
-            </button>
-          )}
-
+          <span className="donepanel__title">Nice work today ✓</span>
           <p className="nextdaynote">
             Tomorrow opens on its own once today's really over.
           </p>
@@ -198,6 +166,13 @@ export function Home() {
       </div>
 
       <div className="home__dock">{renderMissionCard()}</div>
+
+      {celebrating && (
+        <StreakCelebration
+          streak={player.streakCurrent}
+          onContinue={() => setCelebrating(false)}
+        />
+      )}
     </div>
   )
 }

@@ -245,9 +245,10 @@
 }
 
 /* ---------------------------------------------------------------
-   Post-completion panel — reactions and an optional note. Next week opens
-   on its own once the calendar actually turns over; nothing here should
-   let her skip ahead of that.
+   Post-completion panel — shown after the celebration overlay is
+   dismissed, for the rest of the day. Tomorrow opens on its own once
+   the calendar actually turns over; nothing here should let her skip
+   ahead of that.
    --------------------------------------------------------------- */
 
 .donepanel {
@@ -258,7 +259,9 @@
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
 }
 
 .donepanel--frozen {
@@ -275,55 +278,6 @@
 .donepanel__sub {
   font-size: 12px;
   color: var(--text-faint);
-}
-
-.reactionrow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.reactionchip {
-  background: var(--card-sunk);
-  border: 1.5px solid var(--card-edge);
-  border-radius: 999px;
-  padding: 7px 11px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-soft);
-}
-
-.reactionchip[data-picked='true'] {
-  border-color: var(--gold);
-  background: rgba(255, 200, 0, 0.14);
-  color: var(--gold);
-}
-
-.reflectbox {
-  width: 100%;
-  min-height: 54px;
-  background: var(--card-sunk);
-  border: 1.5px solid var(--card-edge);
-  border-radius: var(--r-sm);
-  color: var(--text);
-  font-family: var(--ui);
-  font-size: 13px;
-  padding: 10px 12px;
-  resize: none;
-}
-
-.reflectbox::placeholder {
-  color: var(--text-faint);
-}
-
-.savebtn {
-  align-self: flex-start;
-  background: var(--card-edge);
-  color: var(--text);
-  font-weight: 700;
-  font-size: 12px;
-  padding: 8px 14px;
-  border-radius: var(--r-sm);
 }
 
 .nextdaynote {
