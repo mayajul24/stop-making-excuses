@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Difficulty } from '../types'
 import { TIER_ORDER, TIERS } from '../lib/game'
 import { buildPath } from '../lib/path'
@@ -15,6 +15,9 @@ import './Home.css'
   the pinned green bar carries the day-level status (context, always true),
   the docked card at the bottom carries the specific mission (the one thing
   she can act on right now). They should never say the same sentence twice.
+  While today's still open, the docked card stays hidden until she taps the
+  live node on the path — matching the reference, where the circle itself
+  is what surfaces the "start" sheet rather than it sitting there by default.
 */
 function statusLine(status: 'open' | 'done' | 'frozen' | 'missed') {
   if (status === 'done') return 'Nice work today'
@@ -33,6 +36,16 @@ export function Home() {
   // player until she actually taps DONE.
   const [override, setOverride] = useState<Difficulty | null>(null)
   const [easierBanner, setEasierBanner] = useState(false)
+
+  // The mission card doesn't sit docked by default anymore — she taps the
+  // live node on the path to bring it up, matching the reference. Only
+  // matters while today's still open; done/frozen panels always show.
+  const [missionOpen, setMissionOpen] = useState(false)
+  // Without this, "already tapped open" would carry over from yesterday's
+  // card into a fresh day that hasn't been tapped yet.
+  useEffect(() => {
+    setMissionOpen(false)
+  }, [player.dayIndex])
 
   // Only true right after she taps DONE this session — revisiting Home
   // later the same day (already done from an earlier visit) shouldn't
@@ -195,10 +208,13 @@ export function Home() {
           nodes={nodes}
           mascotLine={voice.mascotLine}
           mascotMood={voice.mascotMood}
+          onLiveNodeClick={() => setMissionOpen(true)}
         />
       </div>
 
-      <div className="home__dock">{renderMissionCard()}</div>
+      {(player.dayStatus !== 'open' || missionOpen) && (
+        <div className="home__dock">{renderMissionCard()}</div>
+      )}
 
       {celebrating && (
         <StreakCelebration

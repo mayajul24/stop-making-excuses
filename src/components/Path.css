@@ -79,8 +79,13 @@
   border: 3px solid var(--gold);
   border-bottom-width: 6px;
   border-bottom-color: var(--gold-deep);
+  cursor: pointer;
   animation: node-pop 0.36s var(--ease-bounce) both,
     glow 1.9s ease-in-out 0.4s infinite;
+}
+
+.path__node[data-kind='current']:active {
+  transform: scale(0.94);
 }
 
 @keyframes glow {
@@ -149,6 +154,18 @@
   height: 7px;
   border-radius: 50%;
   background: var(--card-edge);
+}
+
+/* --- faint scattered background glyphs, future stretch only ---- */
+
+.path__decor {
+  position: absolute;
+  top: 6px;
+  font-size: 26px;
+  opacity: 0.14;
+  filter: grayscale(1);
+  pointer-events: none;
+  user-select: none;
 }
 
 /* --- the mascot, parked next to the live step ------------------- */

@@ -14,6 +14,12 @@ import './Path.css'
 /** Horizontal snake. Repeats every 8 nodes. */
 const SNAKE = [0, 46, 72, 46, 0, -46, -72, -46]
 
+// Faint background glyphs scattered through the unexplored stretch of the
+// path — Duolingo does this with grey lesson-type icons; we don't have
+// those, so these are themed to the app instead. Deterministic from the
+// node's position (not random) so they don't reshuffle on every re-render.
+const DECOR_GLYPHS = ['💬', '✨', '💌', '☕', '👠']
+
 const GLYPH: Record<PathNode['kind'], string> = {
   done: '✓',
   milestone: '🎁',
@@ -27,10 +33,14 @@ export function Path({
   nodes,
   mascotLine,
   mascotMood,
+  onLiveNodeClick,
 }: {
   nodes: PathNode[]
   mascotLine: string
   mascotMood: Mood
+  /** Tapping the live step's circle, matching the reference — the mission
+   *  card doesn't just sit there, she has to tap the node to bring it up. */
+  onLiveNodeClick?: () => void
 }) {
   const liveStep = useRef<HTMLDivElement>(null)
 
@@ -49,6 +59,10 @@ export function Path({
           ? (offset + SNAKE[(i + 1) % SNAKE.length]) / 2
           : 0
 
+        // Every 4th still-unplayed step gets a faint glyph on the side the
+        // path isn't leaning toward, so it never sits under the node itself.
+        const showDecor = node.kind === 'future' && i % 4 === 2
+
         return (
           <div
             className="path__step"
@@ -59,7 +73,12 @@ export function Path({
               className="path__slot"
               style={{ transform: `translateX(${offset}px)` }}
             >
-              <div className="path__node" data-kind={node.kind}>
+              <div
+                className="path__node"
+                data-kind={node.kind}
+                onClick={node.isLive ? onLiveNodeClick : undefined}
+                role={node.isLive && onLiveNodeClick ? 'button' : undefined}
+              >
                 <span className="path__glyph">{GLYPH[node.kind]}</span>
               </div>
 
@@ -79,6 +98,16 @@ export function Path({
                   <Mascot mood={mascotMood} size={72} />
                   <div className="path__bubble">{mascotLine}</div>
                 </div>
+              )}
+
+              {showDecor && (
+                <span
+                  className="path__decor"
+                  style={{ transform: `translateX(${offset >= 0 ? -68 : 68}px)` }}
+                  aria-hidden="true"
+                >
+                  {DECOR_GLYPHS[Math.floor(i / 4) % DECOR_GLYPHS.length]}
+                </span>
               )}
             </div>
 

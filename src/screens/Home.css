@@ -26,14 +26,15 @@
 .vitals {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 26px;
-  padding: 0 2px 14px;
+  justify-content: space-between;
+  padding: 0 6px 14px;
 }
 
 .vital {
   display: inline-flex;
+  flex: 1;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   font-size: 18px;
   line-height: 1;
