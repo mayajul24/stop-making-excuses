@@ -38,6 +38,10 @@ export function Home() {
   // later the same day (already done from an earlier visit) shouldn't
   // replay the celebration.
   const [celebrating, setCelebrating] = useState(false)
+  // Captured the moment DONE is tapped, before markDone updates the
+  // player — lets the celebration animate FROM the old count TO the new
+  // one instead of just popping in the final number.
+  const [prevStreak, setPrevStreak] = useState(0)
 
   // Hidden test menu — 6 taps on the streak flame within 1.5s opens it.
   // Not linked from anywhere visible, so it won't get found by accident.
@@ -77,9 +81,17 @@ export function Home() {
   }
 
   function handleMarkDone() {
+    setPrevStreak(player.streakCurrent)
     markDone(selected)
     setOverride(null)
     setEasierBanner(false)
+    setCelebrating(true)
+  }
+
+  // Debug-only: simulates the same "old -> new" jump a real completion
+  // would produce, since there's no real prior state to capture here.
+  function handlePreviewStreak() {
+    setPrevStreak(Math.max(0, player.streakCurrent - 1))
     setCelebrating(true)
   }
 
@@ -185,6 +197,7 @@ export function Home() {
       {celebrating && (
         <StreakCelebration
           streak={player.streakCurrent}
+          previousStreak={prevStreak}
           onContinue={() => setCelebrating(false)}
         />
       )}
@@ -192,7 +205,7 @@ export function Home() {
       {debugOpen && (
         <DebugPanel
           streak={player.streakCurrent}
-          onPreviewStreak={() => setCelebrating(true)}
+          onPreviewStreak={handlePreviewStreak}
           onClose={() => setDebugOpen(false)}
         />
       )}

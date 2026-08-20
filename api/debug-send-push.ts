@@ -16,6 +16,10 @@ import webpush from 'web-push'
     no-auth, single-user posture.
   - Always bypasses the "already sent recently" dedup, so testing
     doesn't need to wait out a 20-hour window.
+  - Ignores dayStatus entirely. The real send-push.ts only nudges when
+    today's still open (no point nagging about a day already done) --
+    but for testing copy/icon changes, she needs it to fire regardless
+    of whether the daily challenge is actually done.
 */
 
 type Difficulty = 'easy' | 'medium' | 'hard' | 'nightmare'
@@ -63,13 +67,11 @@ function pick(list: string[], seed: number): string {
   return list[Math.abs(seed) % list.length]
 }
 
-function eveningNudge(s: PlayerState, seed: number): PushNotification | null {
-  if (s.dayStatus !== 'open') return null
+function eveningNudge(seed: number): PushNotification {
   return { trigger: 'evening_nudge', title: APP_NAME, body: pick(EVENING_LINES, seed), icon: ICON_SMILING }
 }
 
-function urgentNudge(s: PlayerState, seed: number): PushNotification | null {
-  if (s.dayStatus !== 'open') return null
+function urgentNudge(seed: number): PushNotification {
   return { trigger: 'urgent_nudge', title: APP_NAME, body: pick(URGENT_LINES, seed), icon: ICON_ALARMED }
 }
 
@@ -107,13 +109,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const player = stateRow.data as PlayerState
-  const notification =
-    slot === 'evening' ? eveningNudge(player, player.dayIndex) : urgentNudge(player, player.dayIndex)
-
-  if (!notification) {
-    res.status(200).json({ sent: false, reason: 'nothing to say right now' })
-    return
-  }
+  const notification = slot === 'evening' ? eveningNudge(player.dayIndex) : urgentNudge(player.dayIndex)
 
   webpush.setVapidDetails('mailto:noreply@example.com', vapidPublic, vapidPrivate)
 

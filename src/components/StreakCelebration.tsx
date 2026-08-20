@@ -31,12 +31,15 @@ function useConfettiPieces(count: number) {
 
 export function StreakCelebration({
   streak,
+  previousStreak,
   onContinue,
 }: {
   streak: number
+  previousStreak: number
   onContinue: () => void
 }) {
   const pieces = useConfettiPieces(46)
+  const showTransition = previousStreak !== streak
 
   return (
     <div className="celebrate">
@@ -60,13 +63,31 @@ export function StreakCelebration({
 
       <div className="celebrate__flame-stack">
         <div className="celebrate__flame-base">
-          <StreakFlame lit={false} size={72} />
+          <StreakFlame lit={false} size={104} />
         </div>
         <div className="celebrate__flame-fill">
-          <StreakFlame lit size={72} />
+          <StreakFlame lit size={104} />
         </div>
       </div>
-      <div className="celebrate__streak">{streak}</div>
+
+      {/* Slides the old count up and out while the new one slides up and
+          in from below — the odometer-flip Duolingo itself uses, rather
+          than just popping the final number straight in. */}
+      <div className="celebrate__streak-wrap">
+        {showTransition && (
+          <span className="celebrate__streak-digit celebrate__streak-digit--old">
+            {previousStreak}
+          </span>
+        )}
+        <span
+          className={`celebrate__streak-digit ${
+            showTransition ? 'celebrate__streak-digit--new' : 'celebrate__streak-digit--pop'
+          }`}
+        >
+          {streak}
+        </span>
+      </div>
+
       <div className="celebrate__title">{streak} day streak!</div>
       <div className="celebrate__sub">Nice work today.</div>
       <button className="celebrate__continue" onClick={onContinue}>
