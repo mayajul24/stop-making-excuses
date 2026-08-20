@@ -47,6 +47,13 @@ self.addEventListener('push', (event) => {
       // Same trigger replaces its own prior notification instead of
       // stacking a new one on top of an unread one from earlier today.
       tag: payload.trigger || 'stop-making-excuses',
+      // Buzz + stay put until she deals with it, rather than silently
+      // landing in the tray. This is the most a web push can control —
+      // whether it actually pops up as a heads-up banner over other apps
+      // is gated by Android's own per-site notification channel, which
+      // JS can't set (see the note where this is sent from).
+      vibrate: [200, 100, 200],
+      requireInteraction: true,
     }),
   )
 })
