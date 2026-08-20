@@ -20,12 +20,18 @@ const SNAKE = [0, 46, 72, 46, 0, -46, -72, -46]
 // on re-render.
 const DECOR_GLYPHS = ['💬', '✨', '💌', '☕', '👠']
 
-// Future nodes used to all be identical blank dimmed circles — a real
-// path stretches out with a mix of icons, like Duolingo's varied lesson
-// types. These are themed to what the "missions" actually are: dates
-// (coffee, hearts), the fear around them (skull, anxious face), and
-// small wins (sparkle, chat).
-const FUTURE_GLYPHS = ['☕', '❤️', '💀', '😰', '💬', '✨']
+// Future nodes used to all be identical blank dimmed grey circles — the
+// reference has them in bright, varied colors, not muted. Each glyph gets
+// its own color from the app's existing palette rather than all sharing
+// one, matching that variety.
+const FUTURE_STYLES: { glyph: string; bg: string; border: string }[] = [
+  { glyph: '☕', bg: 'var(--orange)', border: 'var(--orange-deep)' },
+  { glyph: '❤️', bg: 'var(--rose)', border: 'var(--rose-deep)' },
+  { glyph: '💀', bg: 'var(--lilac)', border: 'var(--lilac-deep)' },
+  { glyph: '😰', bg: 'var(--blue)', border: 'var(--blue-deep)' },
+  { glyph: '💬', bg: 'var(--gold)', border: 'var(--gold-deep)' },
+  { glyph: '✨', bg: 'var(--green)', border: 'var(--green-deep)' },
+]
 
 const GLYPH: Record<PathNode['kind'], string> = {
   done: '✓',
@@ -70,7 +76,8 @@ export function Path({
         // leaning toward, so it never sits under the node itself. Skipped
         // on the live/milestone nodes so those stay visually clean.
         const showDecor = node.kind !== 'current' && node.kind !== 'milestone' && i % 4 === 2
-        const glyph = node.kind === 'future' ? FUTURE_GLYPHS[i % FUTURE_GLYPHS.length] : GLYPH[node.kind]
+        const futureStyle = node.kind === 'future' ? FUTURE_STYLES[i % FUTURE_STYLES.length] : null
+        const glyph = futureStyle ? futureStyle.glyph : GLYPH[node.kind]
 
         return (
           <div
@@ -87,6 +94,11 @@ export function Path({
                 data-kind={node.kind}
                 onClick={node.isLive ? onLiveNodeClick : undefined}
                 role={node.isLive && onLiveNodeClick ? 'button' : undefined}
+                style={
+                  futureStyle
+                    ? { background: futureStyle.bg, borderColor: futureStyle.border }
+                    : undefined
+                }
               >
                 <span className="path__glyph">{glyph}</span>
               </div>

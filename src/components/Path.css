@@ -99,7 +99,7 @@
 }
 
 .path__node[data-kind='future'] {
-  opacity: 0.55;
+  color: var(--on-color);
 }
 
 /* --- labels + stars -------------------------------------------- */
