@@ -132,47 +132,42 @@ export function Home() {
     }
 
     return (
-      <>
+      <div className="misscard rise">
+        <span className="misscard__eyebrow">
+          {tier.rank} · +{tier.xp} XP
+        </span>
+        <span className="misscard__title">{tier.headline}</span>
+
+        <button className="misscard__pill misscard__pill--primary" onClick={handleMarkDone}>
+          Just do it!
+        </button>
+        <button
+          className="misscard__pill misscard__pill--anxious"
+          onClick={handleAnxious}
+          disabled={selected === TIER_ORDER[0]}
+        >
+          😰 I'm anxious — swap the task
+        </button>
+
         {easierBanner && (
           <div className="easiernote rise">
             Okay. No pressure. Let's make it smaller.
           </div>
         )}
-        <div className="secondary-row">
-          <button
-            className="secondary-btn"
-            onClick={handleAnxious}
-            disabled={selected === TIER_ORDER[0]}
-          >
-            😰 I'm anxious
+
+        <div className="misscard__extra">
+          <button className="misscard__link" onClick={cycleDifficulty}>
+            ⇄ Try something else
           </button>
           <button
-            className="secondary-btn"
+            className="misscard__link"
             onClick={freezeToday}
             disabled={player.freezeTokens <= 0}
           >
             ❄️ Freeze ({player.freezeTokens})
           </button>
         </div>
-        <div className="misscard">
-          <span className="misscard__eyebrow">
-            {tier.rank} · +{tier.xp} Courage
-          </span>
-          <span className="misscard__title">{tier.headline}</span>
-          <div className="misscard__row">
-            <button className="misscard__pill" onClick={handleMarkDone}>
-              DONE ✓
-            </button>
-            <button
-              className="misscard__swap"
-              onClick={cycleDifficulty}
-              aria-label="Try a different difficulty"
-            >
-              ⇄
-            </button>
-          </div>
-        </div>
-      </>
+      </div>
     )
   }
 
