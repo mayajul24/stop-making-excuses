@@ -33,6 +33,10 @@ export function Home() {
   // player until she actually taps DONE.
   const [override, setOverride] = useState<Difficulty | null>(null)
   const [easierBanner, setEasierBanner] = useState(false)
+  // True when "I'm anxious" was tapped while already on the easiest tier —
+  // there's nowhere lower to step down to, so the banner points at Freeze
+  // instead of silently doing nothing.
+  const [atFloor, setAtFloor] = useState(false)
 
   // Only true right after she taps DONE this session — revisiting Home
   // later the same day (already done from an earlier visit) shouldn't
@@ -68,15 +72,23 @@ export function Home() {
     const i = TIER_ORDER.indexOf(selected)
     setOverride(TIER_ORDER[(i + 1) % TIER_ORDER.length])
     setEasierBanner(false)
+    setAtFloor(false)
   }
 
   // The "I'm anxious" branch — steps down exactly one rung from whatever's
   // currently offered rather than always jumping to a fixed tier, so it
   // stays "a little smaller" instead of overcorrecting to the floor.
+  // Already on the easiest tier, there's nowhere left to step down to —
+  // point at Freeze instead of leaving the tap looking like it did nothing.
   function handleAnxious() {
     chooseEasier()
     const i = TIER_ORDER.indexOf(selected)
-    setOverride(TIER_ORDER[Math.max(0, i - 1)])
+    if (i === 0) {
+      setAtFloor(true)
+    } else {
+      setOverride(TIER_ORDER[i - 1])
+      setAtFloor(false)
+    }
     setEasierBanner(true)
   }
 
@@ -85,6 +97,7 @@ export function Home() {
     markDone(selected)
     setOverride(null)
     setEasierBanner(false)
+    setAtFloor(false)
     setCelebrating(true)
   }
 
@@ -120,7 +133,9 @@ export function Home() {
       <>
         {easierBanner && (
           <div className="easiernote rise">
-            Okay. No pressure. Let's make it smaller.
+            {atFloor
+              ? "This is already the smallest step. Want to freeze today instead? ❄️"
+              : "Okay. No pressure. Let's make it smaller."}
           </div>
         )}
         <div className="secondary-row">
