@@ -1,11 +1,7 @@
 .mascot {
   flex-shrink: 0;
   overflow: visible;
-}
-
-.mascot__hairback {
-  transform-box: fill-box;
-  transform-origin: 50% 0%;
+  transform-origin: 50% 100%;
 }
 
 /* Proud: a little bounce. */
@@ -13,13 +9,15 @@
   animation: mascot-bounce 0.7s ease-in-out infinite;
 }
 
-/* Idle: hair sways now and then — enough to read as alive. */
-.mascot[data-mood='idle'] .mascot__hairback,
-.mascot[data-mood='smug'] .mascot__hairback {
+/* Idle: a small sway now and then — enough to read as alive. Used to only
+   move the hair layer of the old SVG; now it's a flat image, so the whole
+   thing sways instead. */
+.mascot[data-mood='idle'],
+.mascot[data-mood='smug'] {
   animation: mascot-sway 5s ease-in-out infinite;
 }
 
-/* Unimpressed: nothing moves — the heavy lids do all the acting. */
+/* Unimpressed: nothing moves — no per-mood art to react with anymore. */
 
 @keyframes mascot-bounce {
   0%,
