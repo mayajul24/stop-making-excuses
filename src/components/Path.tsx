@@ -14,11 +14,18 @@ import './Path.css'
 /** Horizontal snake. Repeats every 8 nodes. */
 const SNAKE = [0, 46, 72, 46, 0, -46, -72, -46]
 
-// Faint background glyphs scattered through the unexplored stretch of the
-// path — Duolingo does this with grey lesson-type icons; we don't have
-// those, so these are themed to the app instead. Deterministic from the
-// node's position (not random) so they don't reshuffle on every re-render.
+// Faint background glyphs scattered along the path — Duolingo does this
+// with grey lesson-type icons; ours are themed to the app instead.
+// Deterministic from node position (not random) so they don't reshuffle
+// on re-render.
 const DECOR_GLYPHS = ['💬', '✨', '💌', '☕', '👠']
+
+// Future nodes used to all be identical blank dimmed circles — a real
+// path stretches out with a mix of icons, like Duolingo's varied lesson
+// types. These are themed to what the "missions" actually are: dates
+// (coffee, hearts), the fear around them (skull, anxious face), and
+// small wins (sparkle, chat).
+const FUTURE_GLYPHS = ['☕', '❤️', '💀', '😰', '💬', '✨']
 
 const GLYPH: Record<PathNode['kind'], string> = {
   done: '✓',
@@ -59,9 +66,11 @@ export function Path({
           ? (offset + SNAKE[(i + 1) % SNAKE.length]) / 2
           : 0
 
-        // Every 4th still-unplayed step gets a faint glyph on the side the
-        // path isn't leaning toward, so it never sits under the node itself.
-        const showDecor = node.kind === 'future' && i % 4 === 2
+        // Every 4th step gets a faint glyph on the side the path isn't
+        // leaning toward, so it never sits under the node itself. Skipped
+        // on the live/milestone nodes so those stay visually clean.
+        const showDecor = node.kind !== 'current' && node.kind !== 'milestone' && i % 4 === 2
+        const glyph = node.kind === 'future' ? FUTURE_GLYPHS[i % FUTURE_GLYPHS.length] : GLYPH[node.kind]
 
         return (
           <div
@@ -79,7 +88,7 @@ export function Path({
                 onClick={node.isLive ? onLiveNodeClick : undefined}
                 role={node.isLive && onLiveNodeClick ? 'button' : undefined}
               >
-                <span className="path__glyph">{GLYPH[node.kind]}</span>
+                <span className="path__glyph">{glyph}</span>
               </div>
 
               <div className="path__label" data-kind={node.kind}>

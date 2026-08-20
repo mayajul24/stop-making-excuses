@@ -48,14 +48,17 @@ button {
   display: flex;
   justify-content: center;
   background-color: var(--bg-mid);
+  /* The HUD's own opaque background covers the top of the viewport, which
+     is where a gradient like this would normally read most clearly — so
+     the lightened/star-flecked zone has to reach well down the page for
+     it to be visible at all in the part she's actually scrolling through. */
   background-image:
-    radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1.4px),
-    radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1.4px),
-    radial-gradient(140% 55% at 50% -12%, rgba(45, 70, 84, 0.55), transparent 62%),
-    linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 45%, var(--bg-bottom) 100%);
-  background-size: 46px 46px, 88px 88px, 100% 100%, 100% 100%;
+    radial-gradient(rgba(255, 255, 255, 0.18) 1.4px, transparent 1.8px),
+    radial-gradient(rgba(255, 255, 255, 0.12) 1.2px, transparent 1.6px),
+    radial-gradient(150% 70% at 50% -8%, rgba(60, 92, 110, 0.9), transparent 72%),
+    linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 78%, var(--bg-bottom) 100%);
+  background-size: 42px 42px, 80px 80px, 100% 100%, 100% 100%;
   background-position: 0 0, 20px 30px, 0 0, 0 0;
-  background-attachment: fixed;
 }
 
 /*

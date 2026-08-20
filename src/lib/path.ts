@@ -36,7 +36,10 @@ const VISIBLE_HISTORY = 29
  * runs over her *entire* history so the gold nodes land in the right place
  * even though only the recent tail actually gets rendered.
  */
-export function buildPath(state: PlayerState, futureCount = 1): PathNode[] {
+// A long dimmed tail of upcoming circles, not just a single "tomorrow"
+// placeholder — the endless-looking path she pointed at in Duolingo's own
+// reference screenshots.
+export function buildPath(state: PlayerState, futureCount = 40): PathNode[] {
   const nodes: PathNode[] = []
   let doneSoFar = 0
   const visible = state.history.slice(-VISIBLE_HISTORY)
@@ -112,7 +115,9 @@ export function buildPath(state: PlayerState, futureCount = 1): PathNode[] {
     nodes.push({
       key: `f${state.dayIndex + i}`,
       kind: 'future',
-      label: 'TOMORROW',
+      // Only the very next one says "TOMORROW" — repeating that label
+      // down 40 dimmed circles would just be noise.
+      label: i === 1 ? 'TOMORROW' : '',
       stars: 0,
       dayIndex: state.dayIndex + i,
     })
