@@ -41,9 +41,41 @@
   }
 }
 
-.celebrate__flame {
-  animation: celebrate-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+/* The flame starts grey/unlit and "fills" with color from the bottom up,
+   like Duolingo's own streak animation — not just popping in already lit. */
+.celebrate__flame-stack {
+  position: relative;
+  width: 72px;
+  height: 72px;
   margin-bottom: 6px;
+  animation: celebrate-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+.celebrate__flame-base {
+  position: absolute;
+  inset: 0;
+}
+
+.celebrate__flame-fill {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 0%;
+  overflow: hidden;
+  animation: celebrate-flame-fill 0.6s 0.15s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+.celebrate__flame-fill > svg {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+
+@keyframes celebrate-flame-fill {
+  to {
+    height: 100%;
+  }
 }
 
 .celebrate__streak {
@@ -52,7 +84,7 @@
   font-weight: 900;
   color: var(--on-color);
   line-height: 1;
-  animation: celebrate-pop 0.5s 0.05s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  animation: celebrate-pop 0.45s 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 
 @keyframes celebrate-pop {

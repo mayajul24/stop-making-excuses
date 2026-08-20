@@ -19,7 +19,9 @@ function useConfettiPieces(count: number) {
         id: i,
         left: Math.random() * 100,
         color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-        delay: Math.random() * 0.35,
+        // Held back until the flame fill + number pop finish, so the
+        // sequence reads: flame lights up -> number lands -> confetti.
+        delay: 0.85 + Math.random() * 0.35,
         duration: 2.1 + Math.random() * 1.3,
         drift: Math.round((Math.random() - 0.5) * 70),
       })),
@@ -56,13 +58,16 @@ export function StreakCelebration({
         ))}
       </div>
 
-      <div className="celebrate__flame">
-        <StreakFlame lit size={72} />
+      <div className="celebrate__flame-stack">
+        <div className="celebrate__flame-base">
+          <StreakFlame lit={false} size={72} />
+        </div>
+        <div className="celebrate__flame-fill">
+          <StreakFlame lit size={72} />
+        </div>
       </div>
       <div className="celebrate__streak">{streak}</div>
-      <div className="celebrate__title">
-        {streak > 1 ? `${streak} day streak!` : 'Streak started!'} 🎉
-      </div>
+      <div className="celebrate__title">{streak} day streak!</div>
       <div className="celebrate__sub">Nice work today.</div>
       <button className="celebrate__continue" onClick={onContinue}>
         Continue
