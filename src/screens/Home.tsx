@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { Difficulty } from '../types'
 import { TIER_ORDER, TIERS } from '../lib/game'
 import { buildPath } from '../lib/path'
@@ -7,6 +7,7 @@ import { usePlayer } from '../state/playerStore'
 import { Path } from '../components/Path'
 import { StreakFlame } from '../components/StreakFlame'
 import { StreakCelebration } from '../components/StreakCelebration'
+import { DebugPanel } from '../components/DebugPanel'
 import './Home.css'
 
 /*
@@ -37,6 +38,20 @@ export function Home() {
   // later the same day (already done from an earlier visit) shouldn't
   // replay the celebration.
   const [celebrating, setCelebrating] = useState(false)
+
+  // Hidden test menu — 6 taps on the streak flame within 1.5s opens it.
+  // Not linked from anywhere visible, so it won't get found by accident.
+  const [debugOpen, setDebugOpen] = useState(false)
+  const tapTimes = useRef<number[]>([])
+  function handleStreakTap() {
+    const now = Date.now()
+    tapTimes.current = tapTimes.current.filter((t) => now - t < 1500)
+    tapTimes.current.push(now)
+    if (tapTimes.current.length >= 6) {
+      tapTimes.current = []
+      setDebugOpen(true)
+    }
+  }
 
   // Always defaults to Easy, not whatever's "hardest available" — there's
   // no resource gating difficulty anymore (see game.ts), so the app has to
@@ -135,7 +150,7 @@ export function Home() {
       {/* Stays put however far down the journey she scrolls. */}
       <header className="hud">
         <div className="vitals">
-          <span className="vital vital--streak">
+          <span className="vital vital--streak" onClick={handleStreakTap}>
             <StreakFlame lit={player.streakCurrent > 0} size={20} />
             <b>{player.streakCurrent}</b>
           </span>
@@ -171,6 +186,14 @@ export function Home() {
         <StreakCelebration
           streak={player.streakCurrent}
           onContinue={() => setCelebrating(false)}
+        />
+      )}
+
+      {debugOpen && (
+        <DebugPanel
+          streak={player.streakCurrent}
+          onPreviewStreak={() => setCelebrating(true)}
+          onClose={() => setDebugOpen(false)}
         />
       )}
     </div>
