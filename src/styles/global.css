@@ -32,7 +32,9 @@ button {
 }
 
 /* ---------------------------------------------------------------
-   Shell — sky gradient behind a phone-width column.
+   Shell — a soft glow + faint starfield behind the phone-width column,
+   instead of one flat dark color. The comment above this used to promise
+   a "sky gradient" that the code never actually had — this is that.
    --------------------------------------------------------------- */
 
 .shell {
@@ -45,7 +47,15 @@ button {
   height: 100dvh;
   display: flex;
   justify-content: center;
-  background: var(--bg-mid);
+  background-color: var(--bg-mid);
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1.4px),
+    radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1.4px),
+    radial-gradient(140% 55% at 50% -12%, rgba(45, 70, 84, 0.55), transparent 62%),
+    linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 45%, var(--bg-bottom) 100%);
+  background-size: 46px 46px, 88px 88px, 100% 100%, 100% 100%;
+  background-position: 0 0, 20px 30px, 0 0, 0 0;
+  background-attachment: fixed;
 }
 
 /*

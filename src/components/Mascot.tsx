@@ -14,7 +14,10 @@ import './Mascot.css'
   is what gives it the fuller, rounder silhouette.
 */
 
-const HAIR = '#2e2019'
+// Lighter than her real hair on purpose — the near-black original (#2e2019)
+// all but disappeared against the app's dark background; this still reads
+// as dark brown but actually separates from the backdrop.
+const HAIR = '#4a3327'
 const SKIN = '#e8b98f'
 const SKIN_SHADE = '#d9a679'
 const INK = '#2b2019'
