@@ -4,7 +4,10 @@ import './Mascot.css'
 /*
   Replaced the hand-built SVG (circle-cluster hair, 4 mood-specific face
   variants) with the illustration Maya sent directly — this is that image,
-  background removed, saved as public/mascot.png.
+  background removed and cropped to a head-and-shoulders portrait rather
+  than the full standing body, since a big face reads better at the sizes
+  this actually renders at than a tiny full figure does. Saved as
+  public/mascot.png.
 
   There's only the one static image, no separate art per mood, so `mood`
   no longer changes her expression. It still drives the CSS motion below
@@ -13,9 +16,9 @@ import './Mascot.css'
   needs an actually different face, that means new source art, not code.
 */
 
-const ASPECT = 333 / 300 // public/mascot.png's natural height/width
+const ASPECT = 232 / 320 // public/mascot.png's natural height/width
 
-export function Mascot({ mood = 'idle', size = 76 }: { mood?: Mood; size?: number }) {
+export function Mascot({ mood = 'idle', size = 120 }: { mood?: Mood; size?: number }) {
   return (
     <img
       className="mascot"

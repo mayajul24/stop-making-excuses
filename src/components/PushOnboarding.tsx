@@ -50,7 +50,7 @@ export function PushOnboarding() {
   return (
     <div className="pushonboard">
       <div className="pushonboard__card rise">
-        <Mascot mood="idle" size={88} />
+        <Mascot mood="idle" size={130} />
         <h2 className="pushonboard__title">Want a nudge?</h2>
         <p className="pushonboard__body">
           Turn on notifications and I'll check in when you need a nudge. You

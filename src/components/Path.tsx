@@ -116,7 +116,7 @@ export function Path({
                   className="path__mascot"
                   data-side={offset > 0 ? 'left' : 'right'}
                 >
-                  <Mascot mood={mascotMood} size={100} />
+                  <Mascot mood={mascotMood} size={115} />
                   <div className="path__bubble">{mascotLine}</div>
                 </div>
               )}
