@@ -32,7 +32,6 @@ const ICON_ALARMED = '/notification-icon-alarmed.png'
 // 8pm: friendly, not urgent — plenty of the evening left.
 const EVENING_LINES = [
   "Time to talk to boys 💬 (or girls, I don't judge)",
-  "Prime texting hours. Someone's waiting to hear from you 👀",
   'Go on, say hi to someone 💌',
 ]
 
