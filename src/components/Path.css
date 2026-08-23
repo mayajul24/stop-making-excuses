@@ -172,8 +172,8 @@
 
 .path__mascot {
   position: absolute;
-  top: -10px;
-  width: 104px;
+  top: -24px;
+  width: 140px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -189,8 +189,8 @@
   top: -14px;
   left: 50%;
   transform: translateX(-50%);
-  width: 100px;
-  height: 100px;
+  width: 128px;
+  height: 128px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255, 255, 255, 0.07), transparent 68%);
   z-index: -1;
@@ -232,7 +232,14 @@
 
 @media (max-width: 370px) {
   .path__mascot {
-    width: 92px;
+    width: 108px;
+  }
+  /* Overrides the width/height JS sets on the <img> itself — on a narrow
+     phone the full-size mascot pushes the snaking path too close to the
+     screen edge. */
+  .path__mascot .mascot {
+    width: 78px;
+    height: auto;
   }
   .path__bubble {
     font-size: 11px;
