@@ -208,6 +208,13 @@ export function Home() {
         />
       </div>
 
+      {/* Tapping outside the card closes it, same as tapping outside the
+          reference's bottom sheet — only wired up for the tap-to-open case,
+          not the always-visible done/frozen panels. */}
+      {player.dayStatus === 'open' && missionOpen && (
+        <div className="dock-backdrop" onClick={() => setMissionOpen(false)} />
+      )}
+
       {(player.dayStatus !== 'open' || missionOpen) && (
         <div className="home__dock">{renderMissionCard()}</div>
       )}

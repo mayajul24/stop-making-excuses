@@ -122,6 +122,16 @@
   );
 }
 
+/* Sits below the dock (z-index 15) but above the scrolling path, so a tap
+   anywhere outside the card closes it — the dock itself still catches its
+   own clicks first since it's stacked above this. */
+.dock-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 14;
+  background: rgba(0, 0, 0, 0.35);
+}
+
 .misscard {
   background: var(--green);
   border-radius: var(--r-lg);
