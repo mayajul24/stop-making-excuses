@@ -1,5 +1,5 @@
 import type { PlayerState } from '../types'
-import { TIERS } from './game'
+import { TIERS, tierVariant } from './game'
 
 export type NodeKind =
   | 'done'
@@ -56,7 +56,10 @@ export function buildPath(state: PlayerState, futureCount = 40): PathNode[] {
       nodes.push({
         key: `d${day.dayIndex}`,
         kind: doneSoFar % 5 === 0 ? 'milestone' : 'done',
-        label: tier ? tier.done : 'DONE',
+        // Re-derived from the day's own index, not looked up from anywhere
+        // stored — same deterministic pick tierVariant() would've made
+        // that day, so a past node always shows what it actually showed.
+        label: tier ? tierVariant(tier, day.dayIndex).done : 'DONE',
         stars: tier ? tier.stars : 0,
         dayIndex: day.dayIndex,
       })
@@ -86,7 +89,7 @@ export function buildPath(state: PlayerState, futureCount = 40): PathNode[] {
     nodes.push({
       key: `d${state.dayIndex}`,
       kind: doneSoFar % 5 === 0 ? 'milestone' : 'done',
-      label: tier ? tier.done : 'DONE',
+      label: tier ? tierVariant(tier, state.dayIndex).done : 'DONE',
       stars: tier ? tier.stars : 0,
       dayIndex: state.dayIndex,
       isLive: true,

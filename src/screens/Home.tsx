@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Difficulty } from '../types'
-import { TIER_ORDER, TIERS } from '../lib/game'
+import { TIER_ORDER, TIERS, tierVariant } from '../lib/game'
 import { buildPath } from '../lib/path'
 import { homeVoice } from '../lib/voice'
 import { usePlayer } from '../state/playerStore'
@@ -76,6 +76,7 @@ export function Home() {
   // Escalating is something she opts into via ⇄, never the default.
   const selected = override ?? 'easy'
   const tier = TIERS[selected]
+  const variant = tierVariant(tier, player.dayIndex)
 
   function cycleDifficulty() {
     const i = TIER_ORDER.indexOf(selected)
@@ -136,7 +137,7 @@ export function Home() {
         <span className="misscard__eyebrow">
           {tier.rank} · +{tier.xp} XP
         </span>
-        <span className="misscard__title">{tier.headline}</span>
+        <span className="misscard__title">{variant.headline}</span>
 
         <button className="misscard__pill misscard__pill--primary" onClick={handleMarkDone}>
           Just do it!

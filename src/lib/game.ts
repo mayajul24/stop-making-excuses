@@ -20,30 +20,41 @@ import type { Difficulty, PlayerState, Reaction, DayRecord } from '../types'
 
 export const FREEZE_MAX = 4
 
+/** One concrete task within a tier — see Tier.variants. */
+export interface TierVariant {
+  /** English display headline — the thing that gets set big. */
+  headline: string
+  /** Past tense, for a completed node on the journey. */
+  done: string
+}
+
 export interface Tier {
   id: Difficulty
   rank: string
-  /** English display headline — the thing that gets set big. */
-  headline: string
   /** Imperative, for the main button: "NEXT STEP: SEND A MESSAGE". */
   action: string
-  /** Past tense, for a completed node on the journey. */
-  done: string
   /** Why it's worth doing — the quieter, reassuring voice. */
   why: string
   /** Step-by-step, shown once she's committed to the mission. */
   steps: string[]
   xp: number
   stars: 1 | 2 | 3
+  /**
+   * The same tier used to mean exactly one fixed task forever — Easy was
+   * always "OPEN THE APP", every single day. Real friend feedback: it got
+   * noticed and got boring. A tier now offers a small pool of equivalent
+   * tasks, and tierVariant() below picks one deterministically per day, so
+   * a given day always shows the same thing on refresh but it actually
+   * varies day to day.
+   */
+  variants: TierVariant[]
 }
 
 export const TIERS: Record<Difficulty, Tier> = {
   easy: {
     id: 'easy',
     rank: '🌱 BARELY BRAVE',
-    headline: 'OPEN THE APP',
     action: 'OPEN THE APP',
-    done: 'OPENED THE APP',
     why: 'You don’t have to write anything. Open it, scroll, like one person you actually think is cute. Today’s done.',
     steps: [
       'Open the dating app',
@@ -52,13 +63,16 @@ export const TIERS: Record<Difficulty, Tier> = {
     ],
     xp: 5,
     stars: 1,
+    variants: [
+      { headline: 'OPEN THE APP', done: 'OPENED THE APP' },
+      { headline: 'LOOK AT YOUR MATCHES', done: 'LOOKED AT YOUR MATCHES' },
+      { headline: 'LIKE SOMEONE NEW', done: 'LIKED SOMEONE NEW' },
+    ],
   },
   medium: {
     id: 'medium',
     rank: '😬 A LITTLE ANXIOUS',
-    headline: 'SEND A MESSAGE',
     action: 'SEND A MESSAGE',
-    done: 'SENT A MESSAGE',
     why: 'You don’t need to find a husband. You need to reply to one human being.',
     steps: [
       'Pick one match',
@@ -67,13 +81,16 @@ export const TIERS: Record<Difficulty, Tier> = {
     ],
     xp: 25,
     stars: 2,
+    variants: [
+      { headline: 'SEND A MESSAGE', done: 'SENT A MESSAGE' },
+      { headline: 'REPLY TO SOMEONE', done: 'REPLIED TO SOMEONE' },
+      { headline: 'START A CONVERSATION', done: 'STARTED A CONVERSATION' },
+    ],
   },
   hard: {
     id: 'hard',
     rank: '😳 OKAY WE’RE DOING THIS',
-    headline: 'SUGGEST COFFEE',
     action: 'SUGGEST COFFEE',
-    done: 'SUGGESTED COFFEE',
     why: 'Not a Big Declaration. Just "want to grab a coffee sometime?" Worst case is "no", and the worst thing after a no is nothing.',
     steps: [
       'Check the conversation is actually flowing',
@@ -82,21 +99,35 @@ export const TIERS: Record<Difficulty, Tier> = {
     ],
     xp: 50,
     stars: 3,
+    variants: [
+      { headline: 'SUGGEST COFFEE', done: 'SUGGESTED COFFEE' },
+      { headline: 'ASK FOR THEIR NUMBER', done: 'ASKED FOR THEIR NUMBER' },
+      { headline: 'SUGGEST A CALL', done: 'SUGGESTED A CALL' },
+    ],
   },
   nightmare: {
     id: 'nightmare',
     rank: '💀 MAIN CHARACTER',
-    headline: 'GO ON A DATE',
     action: 'GO ON A DATE',
-    done: 'WENT ON A DATE',
     why: 'Ninety minutes. Public place. You’re allowed to leave after.',
     steps: ['Pick a public place', 'Tell Maya when and where', 'Go'],
     xp: 75,
     stars: 3,
+    variants: [
+      { headline: 'GO ON A DATE', done: 'WENT ON A DATE' },
+      { headline: 'ASK SOMEONE OUT', done: 'ASKED SOMEONE OUT' },
+      { headline: 'MAKE THE FIRST MOVE', done: 'MADE THE FIRST MOVE' },
+    ],
   },
 }
 
 export const TIER_ORDER: Difficulty[] = ['easy', 'medium', 'hard', 'nightmare']
+
+/** Same day always resolves to the same variant (seeded by dayIndex), so a
+ *  refresh doesn't reshuffle it, but different days actually differ. */
+export function tierVariant(tier: Tier, dayIndex: number): TierVariant {
+  return tier.variants[Math.abs(dayIndex) % tier.variants.length]
+}
 
 /* --------------------------------------------------------------------
    Levels — one level per completed challenge, not per raw XP.
